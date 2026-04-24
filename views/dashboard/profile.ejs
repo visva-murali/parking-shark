@@ -1,0 +1,57 @@
+<h2 class="mb-4">Profile</h2>
+
+<div class="row g-4">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Account</h5>
+        <form method="post" action="/profile">
+          <div class="mb-2">
+            <label class="form-label small">Computing ID</label>
+            <input class="form-control" value="<%= user.computing_id %>" disabled />
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">First name</label>
+            <input name="first_name" class="form-control" value="<%= user.first_name %>" required />
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">Last name</label>
+            <input name="last_name" class="form-control" value="<%= user.last_name %>" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label small">Email</label>
+            <input type="email" name="email" class="form-control" value="<%= user.email %>" required />
+          </div>
+          <button class="btn btn-primary">Save</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Phone numbers</h5>
+        <% if (!phones.length) { %>
+          <p class="text-muted small">No phone numbers on file.</p>
+        <% } else { %>
+          <ul class="list-group mb-3">
+            <% phones.forEach((p) => { %>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <%= p.phone_number %>
+                <form method="post" action="/profile/phones/delete" class="d-inline">
+                  <input type="hidden" name="phone_number" value="<%= p.phone_number %>" />
+                  <button class="btn btn-outline-danger btn-sm">Remove</button>
+                </form>
+              </li>
+            <% }) %>
+          </ul>
+        <% } %>
+        <form method="post" action="/profile/phones" class="d-flex gap-2">
+          <input name="phone_number" class="form-control" placeholder="434-555-0100" required />
+          <button class="btn btn-primary">Add</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

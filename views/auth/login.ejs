@@ -1,0 +1,27 @@
+<div class="row justify-content-center" style="margin-top:3rem">
+  <div class="col-md-4 col-sm-10">
+    <div class="auth-card">
+      <div class="mb-4">
+        <h2 style="font-family:'Barlow Condensed';font-size:2rem;font-weight:700;margin-bottom:4px">Welcome back</h2>
+        <p style="color:var(--text-muted);font-size:0.875rem;margin:0">Sign in to your Parking Shark account.</p>
+      </div>
+      <% if (error) { %>
+        <div class="alert alert-danger mb-3"><%= error %></div>
+      <% } %>
+      <form method="post" action="/login">
+        <div class="mb-3">
+          <label class="form-label">Email</label>
+          <input type="email" name="email" class="form-control" value="<%= form.email || '' %>" required autofocus />
+        </div>
+        <div class="mb-4">
+          <label class="form-label">Password</label>
+          <input type="password" name="password" class="form-control" required />
+        </div>
+        <button class="btn btn-primary w-100" type="submit" style="padding:11px">Log in</button>
+      </form>
+      <p style="text-align:center;margin-top:1.25rem;margin-bottom:0;font-size:0.85rem;color:var(--text-muted)">
+        No account? <a href="/register" style="color:var(--accent);text-decoration:none">Sign up</a>
+      </p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,31 @@
+<nav class="ps-navbar">
+  <div class="container">
+    <a class="ps-brand" href="/">
+      <span class="shark-icon">🦈</span>
+      Parking Shark
+    </a>
+
+    <div class="ps-nav-links d-none d-md-flex">
+      <a class="ps-nav-link <%= path === '/spots' || path.startsWith('/spots') ? 'active' : '' %>" href="/spots">Find a spot</a>
+      <% if (currentUser) { %>
+        <a class="ps-nav-link <%= path.startsWith('/dashboard/renter') ? 'active' : '' %>" href="/dashboard/renter">My bookings</a>
+        <a class="ps-nav-link <%= path.startsWith('/dashboard/host') ? 'active' : '' %>" href="/dashboard/host">My listings</a>
+        <a class="ps-nav-link <%= path.startsWith('/vehicles') ? 'active' : '' %>" href="/vehicles">Vehicles</a>
+      <% } %>
+    </div>
+
+    <div class="ps-nav-right">
+      <% if (currentUser) { %>
+        <a class="ps-nav-link d-none d-sm-block" href="/profile">
+          <span class="ps-nav-user"><%= currentUser.first_name %></span>
+        </a>
+        <form action="/logout" method="post" class="d-inline">
+          <button class="btn btn-outline-secondary btn-sm" type="submit">Log out</button>
+        </form>
+      <% } else { %>
+        <a class="ps-nav-link" href="/login">Log in</a>
+        <a class="btn btn-primary btn-sm" href="/register">Sign up</a>
+      <% } %>
+    </div>
+  </div>
+</nav>

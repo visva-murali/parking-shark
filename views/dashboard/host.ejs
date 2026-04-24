@@ -1,0 +1,131 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h2 class="mb-0">My listings</h2>
+    <% if (rating.avg_rating) { %>
+      <small class="text-muted">⭐ <%= rating.avg_rating %> · <%= rating.total_reviews %> review<%= rating.total_reviews == 1 ? '' : 's' %></small>
+    <% } %>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="/export/host-bookings.csv" class="btn btn-outline-secondary">Export bookings CSV</a>
+    <a href="/spots/new" class="btn btn-primary">+ List a new spot</a>
+  </div>
+</div>
+
+<h4 class="mt-4">Listings</h4>
+<% if (!spots.length) { %>
+  <div class="alert alert-info">No spots yet. <a href="/spots/new">List your first one.</a></div>
+<% } else { %>
+  <div class="table-responsive">
+    <table class="table bg-white shadow-sm align-middle">
+      <thead>
+        <tr>
+          <th>Spot</th>
+          <th>Type</th>
+          <th>Rate</th>
+          <th>Active?</th>
+          <th>Bookings</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% spots.forEach((s) => { %>
+          <tr>
+            <td>
+              <a href="/spots/<%= s.spot_id %>"><%= s.street %></a>
+              <div class="small text-muted"><%= s.city %></div>
+            </td>
+            <td><%= s.type_name %></td>
+            <td>$<%= Number(s.hourly_rate).toFixed(2) %></td>
+            <td>
+              <% if (s.is_active) { %>
+                <span class="badge bg-success">Active</span>
+              <% } else { %>
+                <span class="badge bg-secondary">Inactive</span>
+              <% } %>
+            </td>
+            <td><%= s.total_bookings %></td>
+            <td>
+              <a href="/spots/<%= s.spot_id %>/edit" class="btn btn-sm btn-outline-primary">Edit</a>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>
+
+<h4 class="mt-5">Incoming bookings</h4>
+<% if (!bookings.length) { %>
+  <p class="text-muted">No bookings yet.</p>
+<% } else { %>
+  <div class="table-responsive">
+    <table class="table bg-white shadow-sm align-middle">
+      <thead>
+        <tr>
+          <th>When</th>
+          <th>Spot</th>
+          <th>Renter</th>
+          <th>Vehicle</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% bookings.forEach((b) => { %>
+          <tr>
+            <td>
+              <%= new Date(b.start_time).toLocaleString() %>
+              <div class="small text-muted">→ <%= new Date(b.end_time).toLocaleString() %></div>
+            </td>
+            <td><%= b.street %></td>
+            <td>
+              <%= b.renter_first %> <%= b.renter_last %>
+              <div class="small text-muted"><%= b.email %></div>
+            </td>
+            <td>
+              <%= b.make %> <%= b.model %>
+              <% if (b.license_plate) { %><div class="small text-muted"><%= b.license_plate %></div><% } %>
+            </td>
+            <td>$<%= Number(b.total_cost).toFixed(2) %></td>
+            <td>
+              <span class="badge bg-<%= {Pending:'warning',Confirmed:'primary',Completed:'success',Cancelled:'secondary'}[b.status_name] || 'light' %>">
+                <%= b.status_name %>
+              </span>
+            </td>
+            <td class="text-nowrap">
+              <a href="/reservations/<%= b.reservation_id %>" class="btn btn-sm btn-outline-primary">View</a>
+              <% if (b.status_name === 'Pending') { %>
+                <button class="btn btn-sm btn-primary" data-status-action="confirm" data-res-id="<%= b.reservation_id %>">Confirm</button>
+              <% } else if (b.status_name === 'Confirmed') { %>
+                <button class="btn btn-sm btn-success" data-status-action="complete" data-res-id="<%= b.reservation_id %>">Complete</button>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>
+
+<h4 class="mt-5">Reviews</h4>
+<% if (!reviews.length) { %>
+  <p class="text-muted">No reviews yet.</p>
+<% } else { %>
+  <div class="row g-3">
+    <% reviews.forEach((rv) => { %>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <strong><%= '⭐'.repeat(rv.rating) %></strong>
+              <small class="text-muted"><%= new Date(rv.created_at).toLocaleDateString() %></small>
+            </div>
+            <p class="mb-1 mt-2"><%= rv.comment %></p>
+            <small class="text-muted">— <%= rv.renter_first %> <%= rv.renter_last %> · <%= rv.street %></small>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+<% } %>

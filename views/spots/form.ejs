@@ -1,0 +1,92 @@
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h2 class="mb-4"><%= title %></h2>
+        <% if (errors && errors.length) { %>
+          <div class="alert alert-danger">
+            <ul class="mb-0">
+              <% errors.forEach((e) => { %><li><%= e.msg %> (<%= e.path || '' %>)</li><% }) %>
+            </ul>
+          </div>
+        <% } %>
+        <form method="post" action="<%= spot ? '/spots/' + spot.spot_id + '/edit' : '/spots' %>">
+          <% if (!spot) { %>
+            <h5 class="mt-2">Address</h5>
+            <div class="row g-3 mb-3">
+              <div class="col-12">
+                <label class="form-label">Street</label>
+                <input name="street" class="form-control" value="<%= form.street || '' %>" required />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">City</label>
+                <input name="city" class="form-control" value="<%= form.city || 'Charlottesville' %>" required />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">State</label>
+                <input name="state" maxlength="2" class="form-control" value="<%= form.state || 'VA' %>" required />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Zip</label>
+                <input name="zip_code" class="form-control" value="<%= form.zip_code || '22903' %>" required />
+              </div>
+            </div>
+          <% } %>
+
+          <h5>Spot</h5>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Spot type</label>
+              <select name="spot_type_id" class="form-select" required>
+                <% types.forEach((t) => { %>
+                  <option value="<%= t.spot_type_id %>" <%= form.spot_type_id == t.spot_type_id ? 'selected' : '' %>>
+                    <%= t.type_name %>
+                  </option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Hourly rate ($)</label>
+              <input
+                type="number"
+                step="0.01"
+                min="0.01"
+                name="hourly_rate"
+                class="form-control"
+                value="<%= form.hourly_rate || '5.00' %>"
+                required
+              />
+            </div>
+            <div class="col-12">
+              <label class="form-label">Instructions</label>
+              <textarea name="instructions" class="form-control" rows="3"><%= form.instructions || '' %></textarea>
+            </div>
+            <% if (!spot) { %>
+              <div class="col-12">
+                <label class="form-label">Photo URL (optional)</label>
+                <input name="photo_url" class="form-control" value="<%= form.photo_url || '' %>" />
+              </div>
+            <% } %>
+            <% if (spot) { %>
+              <div class="col-12 form-check ms-3">
+                <input
+                  type="checkbox"
+                  name="is_active"
+                  class="form-check-input"
+                  id="isActive"
+                  <%= (form.is_active === 'on' || form.is_active === true || form.is_active === 1) ? 'checked' : '' %>
+                />
+                <label for="isActive" class="form-check-label">Active</label>
+              </div>
+            <% } %>
+          </div>
+
+          <div class="mt-4 d-flex gap-2">
+            <button class="btn btn-primary" type="submit"><%= spot ? 'Save changes' : 'List it' %></button>
+            <a href="<%= spot ? '/spots/' + spot.spot_id : '/spots' %>" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

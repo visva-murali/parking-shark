@@ -1,0 +1,195 @@
+<div class="row g-4">
+  <!-- Left column -->
+  <div class="col-lg-7">
+    <!-- Header -->
+    <div class="mb-3">
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <span class="badge bg-secondary"><%= spot.type_name %></span>
+        <% if (!spot.is_active) { %><span class="badge bg-danger">Inactive</span><% } %>
+      </div>
+      <h1 style="font-family:'Barlow Condensed';font-size:2.4rem;font-weight:800;margin:0"><%= spot.street %></h1>
+      <p style="color:var(--text-muted);margin:4px 0 0"><%= spot.city %>, <%= spot.state %> <%= spot.zip_code %></p>
+    </div>
+
+    <!-- Price -->
+    <div class="ps-detail-price mb-4">
+      $<%= Number(spot.hourly_rate).toFixed(2) %><span> / hr</span>
+    </div>
+
+    <!-- Photos -->
+    <% if (photos.length) { %>
+      <div class="row g-2 mb-4">
+        <% photos.forEach((p) => { %>
+          <div class="col-4 position-relative">
+            <img src="<%= p.photo_url %>" class="img-fluid rounded" style="height:130px;object-fit:cover;width:100%" alt="photo" onerror="this.parentElement.style.display='none'" />
+            <% if (isOwner) { %>
+              <form method="post" action="/spots/<%= spot.spot_id %>/photos/<%= p.photo_id %>/delete" class="position-absolute top-0 end-0 m-1">
+                <button class="btn btn-sm btn-danger" style="width:24px;height:24px;padding:0;font-size:0.75rem;line-height:1">&times;</button>
+              </form>
+            <% } %>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+
+    <!-- Instructions -->
+    <% if (spot.instructions) { %>
+      <div class="card mb-3">
+        <div class="card-body">
+          <p style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:6px">Host instructions</p>
+          <p style="color:var(--text);margin:0"><%= spot.instructions %></p>
+        </div>
+      </div>
+    <% } %>
+
+    <!-- Host info -->
+    <div class="card mb-3">
+      <div class="card-body d-flex justify-content-between align-items-center">
+        <div>
+          <p style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:3px">Host</p>
+          <p style="color:var(--text);font-weight:500;margin:0"><%= spot.host_first %> <%= spot.host_last %></p>
+        </div>
+        <div class="text-end">
+          <% if (rating.avg_rating) { %>
+            <span class="star-rating">⭐</span>
+            <strong><%= rating.avg_rating %></strong>
+            <span style="font-size:0.8rem;color:var(--text-muted)">(<%= rating.total_reviews %>)</span>
+          <% } else { %>
+            <span style="font-size:0.8rem;color:var(--text-muted)">No reviews yet</span>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Availability -->
+    <div class="card mb-3">
+      <div class="card-body">
+        <p style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:10px">Availability</p>
+        <% if (!windows.length) { %>
+          <p style="color:var(--text-muted);font-size:0.875rem;margin:0">No windows set by host.</p>
+        <% } else { %>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <% windows.forEach((w) => { %>
+              <div class="d-flex align-items-center justify-content-between" style="font-size:0.85rem">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="avail-pill <%= w.availability_kind === 'Available' ? 'available' : 'blocked' %>">
+                    <%= w.availability_kind %>
+                  </span>
+                  <span style="color:var(--text-muted)"><%= new Date(w.start_time).toLocaleString() %> → <%= new Date(w.end_time).toLocaleString() %></span>
+                </div>
+                <% if (isOwner) { %>
+                  <form method="post" action="/spots/<%= spot.spot_id %>/availability/<%= w.window_id %>/delete" class="d-inline">
+                    <button class="btn btn-link btn-sm text-danger p-0" style="font-size:0.75rem">remove</button>
+                  </form>
+                <% } %>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Owner controls -->
+    <% if (isOwner) { %>
+      <div class="card mb-3">
+        <div class="card-body">
+          <p style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:10px">Add availability window</p>
+          <form method="post" action="/spots/<%= spot.spot_id %>/availability">
+            <div class="row g-2 align-items-end">
+              <div class="col-md-4">
+                <label class="form-label">Start</label>
+                <input type="datetime-local" name="start_time" class="form-control" required />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">End</label>
+                <input type="datetime-local" name="end_time" class="form-control" required />
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">Kind</label>
+                <select name="availability_kind" class="form-select">
+                  <option value="Available">Available</option>
+                  <option value="Blocked">Blocked</option>
+                </select>
+              </div>
+              <div class="col-md-2"><button class="btn btn-primary w-100">Add</button></div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="card mb-3">
+        <div class="card-body">
+          <p style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:8px">Add photo</p>
+          <form method="post" action="/spots/<%= spot.spot_id %>/photos" class="d-flex gap-2">
+            <input name="photo_url" class="form-control" placeholder="https://…" required />
+            <button class="btn btn-primary">Add</button>
+          </form>
+        </div>
+      </div>
+      <div class="d-flex gap-2 flex-wrap">
+        <a class="btn btn-outline-primary btn-sm" href="/spots/<%= spot.spot_id %>/edit">Edit listing</a>
+        <form method="post" action="/spots/<%= spot.spot_id %>/deactivate" class="d-inline">
+          <button class="btn btn-outline-warning btn-sm">Deactivate</button>
+        </form>
+        <form method="post" action="/spots/<%= spot.spot_id %>/delete" class="d-inline" onsubmit="return confirm('Delete permanently?')">
+          <button class="btn btn-outline-danger btn-sm">Delete</button>
+        </form>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Right column: booking widget -->
+  <div class="col-lg-5">
+    <div class="card booking-card sticky-top">
+      <div class="card-body p-4">
+        <h5 style="font-family:'Barlow Condensed';font-size:1.3rem;font-weight:700;margin-bottom:1.2rem">Reserve this spot</h5>
+        <% if (!currentUser) { %>
+          <p style="color:var(--text-muted)">Please <a href="/login" style="color:var(--accent)">log in</a> to book.</p>
+        <% } else if (isOwner) { %>
+          <p style="color:var(--text-muted)">You own this spot.</p>
+        <% } else if (!vehicles.length) { %>
+          <p style="color:var(--text-muted)">
+            Add a vehicle first: <a href="/vehicles/new" style="color:var(--accent)">+ Add a vehicle</a>.
+          </p>
+        <% } else if (!spot.is_active) { %>
+          <p style="color:var(--text-muted)">This spot is currently inactive.</p>
+        <% } else { %>
+          <form method="post" action="/reservations" data-booking-form data-hourly-rate="<%= spot.hourly_rate %>">
+            <input type="hidden" name="spot_id" value="<%= spot.spot_id %>" />
+            <div class="mb-3">
+              <label class="form-label">Vehicle</label>
+              <select name="vehicle_id" class="form-select" required>
+                <% vehicles.forEach((v) => { %>
+                  <option value="<%= v.vehicle_id %>">
+                    <%= v.year || '' %> <%= v.make %> <%= v.model %><% if (v.license_plate) { %> · <%= v.license_plate %><% } %>
+                  </option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Start time</label>
+              <input type="datetime-local" name="start_time" class="form-control" required />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">End time</label>
+              <input type="datetime-local" name="end_time" class="form-control" required />
+            </div>
+            <div class="mb-4">
+              <label class="form-label">Payment</label>
+              <select name="payment_method" class="form-select">
+                <option>Credit Card</option>
+                <option>Debit Card</option>
+                <option>PayPal</option>
+                <option>Venmo</option>
+              </select>
+            </div>
+            <div class="booking-card total-display mb-3">
+              <span style="font-size:0.8rem;color:var(--text-muted)">Estimated total</span>
+              <strong data-total-cost>—</strong>
+            </div>
+            <button class="btn btn-primary w-100" type="submit" style="padding:12px;font-size:1rem">Book now</button>
+          </form>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>

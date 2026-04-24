@@ -1,0 +1,46 @@
+<div class="ps-section-header mb-4">
+  <h2 class="ps-section-title">My bookings</h2>
+  <a href="/export/reservations.csv" class="btn btn-outline-secondary btn-sm">↓ Export CSV</a>
+</div>
+
+<% if (!reservations.length) { %>
+  <div class="alert alert-info">
+    You have no bookings yet. <a href="/spots" style="color:var(--accent-blue)">Find a spot →</a>
+  </div>
+<% } else { %>
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Spot</th>
+          <th>When</th>
+          <th>Vehicle</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% reservations.forEach((r) => { %>
+          <tr>
+            <td style="font-weight:500"><%= r.street %><div style="font-size:0.75rem;color:var(--text-muted)"><%= r.city %></div></td>
+            <td style="font-size:0.85rem">
+              <div><%= new Date(r.start_time).toLocaleDateString('en-US',{month:'short',day:'numeric'}) %></div>
+              <div style="color:var(--text-muted)"><%= new Date(r.start_time).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}) %> → <%= new Date(r.end_time).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}) %></div>
+            </td>
+            <td style="font-size:0.85rem"><%= r.make %> <%= r.model %></td>
+            <td style="font-family:'Barlow Condensed';font-size:1.1rem;font-weight:600;color:var(--accent)">$<%= Number(r.total_cost).toFixed(2) %></td>
+            <td>
+              <span class="badge bg-<%= {Pending:'warning',Confirmed:'primary',Completed:'success',Cancelled:'secondary'}[r.status_name] || 'secondary' %>">
+                <%= r.status_name %>
+              </span>
+            </td>
+            <td>
+              <a href="/reservations/<%= r.reservation_id %>" class="btn btn-sm btn-outline-primary">View</a>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>

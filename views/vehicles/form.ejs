@@ -1,0 +1,58 @@
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h2 class="mb-4">Add a vehicle</h2>
+        <% if (errors && errors.length) { %>
+          <div class="alert alert-danger">
+            <ul class="mb-0">
+              <% errors.forEach((e) => { %><li><%= e.msg %></li><% }) %>
+            </ul>
+          </div>
+        <% } %>
+        <form method="post" action="/vehicles">
+          <h5>Vehicle</h5>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Make</label>
+              <input name="make" class="form-control" required value="<%= form.make || '' %>" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Model</label>
+              <input name="model" class="form-control" required value="<%= form.model || '' %>" />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Year</label>
+              <input name="year" type="number" class="form-control" value="<%= form.year || '' %>" />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Color</label>
+              <input name="color" class="form-control" value="<%= form.color || '' %>" />
+            </div>
+          </div>
+
+          <h5>Registration (optional)</h5>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">License plate</label>
+              <input name="license_plate" class="form-control" value="<%= form.license_plate || '' %>" />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">State</label>
+              <input name="plate_state" maxlength="2" class="form-control" value="<%= form.plate_state || 'VA' %>" />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Expires</label>
+              <input name="expires_on" type="date" class="form-control" value="<%= form.expires_on || '' %>" />
+            </div>
+          </div>
+
+          <div class="mt-4 d-flex gap-2">
+            <button class="btn btn-primary">Add vehicle</button>
+            <a href="/vehicles" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,143 @@
+<div class="row">
+  <div class="col-lg-8">
+    <div class="d-flex justify-content-between align-items-start">
+      <div>
+        <h2 class="mb-1">Reservation #<%= r.reservation_id %></h2>
+        <p class="text-muted">
+          <span class="badge bg-<%= {Pending:'warning',Confirmed:'primary',Completed:'success',Cancelled:'secondary'}[r.status_name] || 'light' %> status-badge">
+            <%= r.status_name %>
+          </span>
+        </p>
+      </div>
+      <div class="text-end">
+        <div class="h4 mb-0">$<%= Number(r.total_cost).toFixed(2) %></div>
+        <small class="text-muted">@ $<%= Number(r.hourly_rate_at_booking).toFixed(2) %>/hr</small>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-body">
+        <h6>Spot</h6>
+        <p class="mb-1"><a href="/spots/<%= r.spot_id %>"><%= r.street %></a></p>
+        <p class="text-muted small mb-0">
+          <%= r.city %>, <%= r.state %> <%= r.zip_code %> · <%= r.type_name %>
+        </p>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-body">
+        <h6>When</h6>
+        <p class="mb-1"><strong>Start:</strong> <%= new Date(r.start_time).toLocaleString() %></p>
+        <p class="mb-0"><strong>End:</strong> <%= new Date(r.end_time).toLocaleString() %></p>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-body">
+        <h6>Vehicle</h6>
+        <p class="mb-0"><%= r.year || '' %> <%= r.make %> <%= r.model %> (<%= r.color %>)
+          <% if (r.license_plate) { %> · <%= r.license_plate %> (<%= r.plate_state %>)<% } %>
+        </p>
+      </div>
+    </div>
+
+    <% if (r.payment_id) { %>
+      <div class="card mb-3">
+        <div class="card-body">
+          <h6>Payment</h6>
+          <p class="mb-1">$<%= Number(r.amount).toFixed(2) %> · <%= r.method || '—' %>
+            · <span class="badge bg-secondary"><%= r.payment_status %></span>
+          </p>
+          <% if (r.paid_at) { %>
+            <p class="text-muted small mb-0">Paid <%= new Date(r.paid_at).toLocaleString() %></p>
+          <% } %>
+        </div>
+      </div>
+    <% } %>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card mb-3">
+      <div class="card-body">
+        <h6>Actions</h6>
+
+        <% if (roles.isHost && r.status_name === 'Pending') { %>
+          <form method="post" action="/reservations/<%= r.reservation_id %>/status" class="mb-2">
+            <input type="hidden" name="action" value="confirm" />
+            <button class="btn btn-primary w-100">Confirm booking</button>
+          </form>
+        <% } %>
+        <% if (roles.isHost && r.status_name === 'Confirmed') { %>
+          <form method="post" action="/reservations/<%= r.reservation_id %>/status" class="mb-2">
+            <input type="hidden" name="action" value="complete" />
+            <button class="btn btn-success w-100">Mark complete</button>
+          </form>
+        <% } %>
+        <% if (['Pending','Confirmed'].includes(r.status_name)) { %>
+          <form method="post" action="/reservations/<%= r.reservation_id %>/status" class="mb-2">
+            <input type="hidden" name="action" value="cancel" />
+            <button class="btn btn-outline-danger w-100">Cancel</button>
+          </form>
+        <% } %>
+
+        <% if (roles.isRenter && ['Pending','Confirmed'].includes(r.status_name)) { %>
+          <hr />
+          <form method="post" action="/reservations/<%= r.reservation_id %>/extend">
+            <label class="form-label small">Extend end time</label>
+            <input type="datetime-local" name="end_time" class="form-control form-control-sm mb-2" required />
+            <button class="btn btn-outline-primary btn-sm w-100">Extend</button>
+          </form>
+        <% } %>
+
+        <% if (r.payment_status === 'Pending' && roles.isRenter) { %>
+          <hr />
+          <form method="post" action="/reservations/<%= r.reservation_id %>/pay">
+            <button class="btn btn-success w-100">Mark as paid</button>
+          </form>
+        <% } %>
+
+        <% if (r.status_name === 'Cancelled') { %>
+          <hr />
+          <form
+            method="post"
+            action="/reservations/<%= r.reservation_id %>/delete"
+            onsubmit="return confirm('Delete this cancelled reservation permanently?')"
+          >
+            <button class="btn btn-outline-danger w-100">Delete permanently</button>
+          </form>
+        <% } %>
+      </div>
+    </div>
+
+    <% if (roles.isRenter && r.status_name === 'Completed') { %>
+      <div class="card mb-3">
+        <div class="card-body">
+          <h6>Leave a review</h6>
+          <form method="post" action="/reservations/<%= r.reservation_id %>/review">
+            <div class="mb-2">
+              <label class="form-label small">Rating</label>
+              <select name="rating" class="form-select form-select-sm">
+                <% for (let i = 5; i >= 1; i--) { %>
+                  <option value="<%= i %>" <%= review && review.rating === i ? 'selected' : '' %>>
+                    <%= '⭐'.repeat(i) %>
+                  </option>
+                <% } %>
+              </select>
+            </div>
+            <div class="mb-2">
+              <label class="form-label small">Comment</label>
+              <textarea name="comment" class="form-control form-control-sm" rows="3"><%= review ? review.comment : '' %></textarea>
+            </div>
+            <button class="btn btn-primary btn-sm w-100"><%= review ? 'Update review' : 'Post review' %></button>
+          </form>
+          <% if (review) { %>
+            <form method="post" action="/reservations/<%= r.reservation_id %>/review/delete" class="mt-2">
+              <button class="btn btn-link btn-sm text-danger p-0">Delete review</button>
+            </form>
+          <% } %>
+        </div>
+      </div>
+    <% } %>
+  </div>
+</div>
