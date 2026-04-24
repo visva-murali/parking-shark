@@ -1,65 +1,78 @@
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h2 class="mb-0">My vehicles</h2>
-  <a href="/vehicles/new" class="btn btn-primary">+ Add vehicle</a>
+<div class="ps-section-header mb-4">
+  <h2 class="ps-section-title">My vehicles</h2>
+  <a href="/vehicles/new" class="btn btn-primary btn-sm">+ Add vehicle</a>
 </div>
 
 <% if (!vehicles.length) { %>
-  <div class="alert alert-info">You haven't added any vehicles yet.</div>
+  <div class="alert alert-info">
+    No vehicles yet. <a href="/vehicles/new" style="color:var(--accent-blue)">Add your first vehicle →</a>
+  </div>
 <% } else { %>
-  <div class="table-responsive">
-    <table class="table align-middle bg-white shadow-sm">
-      <thead>
-        <tr>
-          <th>Vehicle</th>
-          <th>Plate</th>
-          <th>Verified?</th>
-          <th class="text-end">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% vehicles.forEach((v) => { %>
-          <tr>
-            <td>
-              <%= v.year || '' %> <%= v.make %> <%= v.model %>
-              <% if (v.color) { %> <span class="text-muted small">(<%= v.color %>)</span><% } %>
-            </td>
-            <td>
-              <% if (v.license_plate) { %>
-                <%= v.license_plate %> (<%= v.plate_state %>)
-                <% if (v.expires_on) { %>
-                  <div class="small text-muted">Expires <%= new Date(v.expires_on).toLocaleDateString() %></div>
+  <div class="row g-3">
+    <% vehicles.forEach((v) => { %>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <h5 style="font-family:'Barlow Condensed';font-size:1.3rem;font-weight:700;margin:0">
+                  <%= v.year || '' %> <%= v.make %> <%= v.model %>
+                </h5>
+                <% if (v.color) { %>
+                  <p style="font-size:0.8rem;color:var(--text-muted);margin:2px 0 0"><%= v.color %></p>
                 <% } %>
-              <% } else { %>
-                <span class="text-muted">none</span>
-              <% } %>
-            </td>
-            <td>
-              <% if (v.is_verified) { %>
-                <span class="badge bg-success">Verified</span>
-              <% } else if (v.license_plate) { %>
-                <span class="badge bg-warning text-dark">Unverified</span>
-              <% } else { %>
-                —
-              <% } %>
-            </td>
-            <td class="text-end">
+              </div>
+              <div>
+                <% if (v.is_verified) { %>
+                  <span class="badge bg-success">✓ Verified</span>
+                <% } else if (v.license_plate) { %>
+                  <span class="badge bg-warning">Unverified</span>
+                <% } %>
+              </div>
+            </div>
+
+            <% if (v.license_plate) { %>
+              <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:14px">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <p style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin:0 0 2px">License plate</p>
+                    <p style="font-family:'Barlow Condensed';font-size:1.2rem;font-weight:700;color:var(--text);margin:0">
+                      <%= v.license_plate %>
+                      <span style="font-family:'DM Sans';font-size:0.8rem;font-weight:400;color:var(--text-muted)"> · <%= v.plate_state %></span>
+                    </p>
+                  </div>
+                  <% if (v.expires_on) { %>
+                    <div style="text-align:right">
+                      <p style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin:0 0 2px">Expires</p>
+                      <p style="font-size:0.8rem;color:var(--text);margin:0"><%= new Date(v.expires_on).toLocaleDateString() %></p>
+                    </div>
+                  <% } %>
+                </div>
+              </div>
+            <% } else { %>
+              <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:14px">No registration on file.</p>
+            <% } %>
+
+            <div class="d-flex gap-2 flex-wrap">
               <% if (v.license_plate && !v.is_verified) { %>
-                <form method="post" action="/vehicles/<%= v.vehicle_id %>/verify" class="d-inline">
+                <form method="post" action="/vehicles/<%= v.vehicle_id %>/verify">
                   <button class="btn btn-outline-success btn-sm">Verify</button>
                 </form>
               <% } %>
               <% if (v.license_plate) { %>
-                <form method="post" action="/vehicles/<%= v.vehicle_id %>/registration/delete" class="d-inline">
+                <form method="post" action="/vehicles/<%= v.vehicle_id %>/registration/delete"
+                      onsubmit="return confirm('Remove the license plate from this vehicle?')">
                   <button class="btn btn-outline-warning btn-sm">Remove plate</button>
                 </form>
               <% } %>
-              <form method="post" action="/vehicles/<%= v.vehicle_id %>/delete" class="d-inline" onsubmit="return confirm('Delete this vehicle?')">
+              <form method="post" action="/vehicles/<%= v.vehicle_id %>/delete"
+                    onsubmit="return confirm('Delete this vehicle?')" class="ms-auto">
                 <button class="btn btn-outline-danger btn-sm">Delete</button>
               </form>
-            </td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% }) %>
   </div>
 <% } %>

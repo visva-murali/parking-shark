@@ -1,55 +1,72 @@
-<h2 class="mb-4">Profile</h2>
+<div class="row">
+  <div class="col-12 mb-4">
+    <h2 style="font-family:'Barlow Condensed';font-size:2.4rem;font-weight:800;margin:0">Account settings</h2>
+    <p style="color:var(--text-muted);margin:4px 0 0;font-size:0.875rem">
+      <%= user.computing_id %> &middot; Member since <%= new Date(user.created_at).toLocaleDateString('en-US',{year:'numeric',month:'long'}) %>
+    </p>
+  </div>
+</div>
 
 <div class="row g-4">
+  <!-- Profile form -->
   <div class="col-md-6">
-    <div class="card">
+    <div class="card h-100">
       <div class="card-body">
-        <h5 class="card-title">Account</h5>
+        <p style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:16px">Profile</p>
         <form method="post" action="/profile">
-          <div class="mb-2">
-            <label class="form-label small">Computing ID</label>
-            <input class="form-control" value="<%= user.computing_id %>" disabled />
-          </div>
-          <div class="mb-2">
-            <label class="form-label small">First name</label>
-            <input name="first_name" class="form-control" value="<%= user.first_name %>" required />
-          </div>
-          <div class="mb-2">
-            <label class="form-label small">Last name</label>
-            <input name="last_name" class="form-control" value="<%= user.last_name %>" required />
-          </div>
           <div class="mb-3">
-            <label class="form-label small">Email</label>
+            <label class="form-label">Computing ID</label>
+            <input class="form-control" value="<%= user.computing_id %>" disabled
+                   style="opacity:0.45;cursor:not-allowed" />
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-6">
+              <label class="form-label">First name</label>
+              <input name="first_name" class="form-control" value="<%= user.first_name %>" required />
+            </div>
+            <div class="col-6">
+              <label class="form-label">Last name</label>
+              <input name="last_name" class="form-control" value="<%= user.last_name %>" required />
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="form-label">Email</label>
             <input type="email" name="email" class="form-control" value="<%= user.email %>" required />
           </div>
-          <button class="btn btn-primary">Save</button>
+          <button class="btn btn-primary">Save changes</button>
         </form>
       </div>
     </div>
   </div>
 
+  <!-- Phone numbers -->
   <div class="col-md-6">
-    <div class="card">
+    <div class="card h-100">
       <div class="card-body">
-        <h5 class="card-title">Phone numbers</h5>
+        <p style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:16px">Phone numbers</p>
+
         <% if (!phones.length) { %>
-          <p class="text-muted small">No phone numbers on file.</p>
+          <p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:16px">No phone numbers on file.</p>
         <% } else { %>
-          <ul class="list-group mb-3">
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
             <% phones.forEach((p) => { %>
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <%= p.phone_number %>
+              <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px">
+                <span style="font-family:'Barlow Condensed';font-size:1.1rem;font-weight:600"><%= p.phone_number %></span>
                 <form method="post" action="/profile/phones/delete" class="d-inline">
                   <input type="hidden" name="phone_number" value="<%= p.phone_number %>" />
-                  <button class="btn btn-outline-danger btn-sm">Remove</button>
+                  <button class="btn btn-outline-danger btn-sm" style="font-size:0.75rem;padding:3px 8px">Remove</button>
                 </form>
-              </li>
+              </div>
             <% }) %>
-          </ul>
+          </div>
         <% } %>
-        <form method="post" action="/profile/phones" class="d-flex gap-2">
-          <input name="phone_number" class="form-control" placeholder="434-555-0100" required />
-          <button class="btn btn-primary">Add</button>
+
+        <form method="post" action="/profile/phones">
+          <label class="form-label">Add phone number</label>
+          <div class="d-flex gap-2">
+            <input name="phone_number" class="form-control" placeholder="434-555-0100" required />
+            <button class="btn btn-primary" style="white-space:nowrap">Add</button>
+          </div>
         </form>
       </div>
     </div>

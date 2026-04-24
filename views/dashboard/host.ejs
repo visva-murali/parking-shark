@@ -1,70 +1,76 @@
-<div class="d-flex justify-content-between align-items-center mb-3">
+<div class="ps-section-header mb-4">
   <div>
-    <h2 class="mb-0">My listings</h2>
+    <h2 class="ps-section-title">My listings</h2>
     <% if (rating.avg_rating) { %>
-      <small class="text-muted">⭐ <%= rating.avg_rating %> · <%= rating.total_reviews %> review<%= rating.total_reviews == 1 ? '' : 's' %></small>
+      <p style="color:var(--text-muted);font-size:0.85rem;margin:4px 0 0">
+        <span class="star-rating">⭐</span>
+        <strong style="color:var(--text)"><%= rating.avg_rating %></strong>
+        &nbsp;·&nbsp; <%= rating.total_reviews %> review<%= rating.total_reviews == 1 ? '' : 's' %>
+      </p>
     <% } %>
   </div>
   <div class="d-flex gap-2">
-    <a href="/export/host-bookings.csv" class="btn btn-outline-secondary">Export bookings CSV</a>
-    <a href="/spots/new" class="btn btn-primary">+ List a new spot</a>
+    <a href="/export/host-bookings.csv" class="btn btn-outline-secondary btn-sm">↓ Export CSV</a>
+    <a href="/spots/new" class="btn btn-primary btn-sm">+ New listing</a>
   </div>
 </div>
 
-<h4 class="mt-4">Listings</h4>
+<!-- ── Spots grid ─────────────────────────────────────────── -->
 <% if (!spots.length) { %>
-  <div class="alert alert-info">No spots yet. <a href="/spots/new">List your first one.</a></div>
+  <div class="alert alert-info mb-5">
+    No spots yet. <a href="/spots/new" style="color:var(--accent-blue)">Create your first listing →</a>
+  </div>
 <% } else { %>
-  <div class="table-responsive">
-    <table class="table bg-white shadow-sm align-middle">
-      <thead>
-        <tr>
-          <th>Spot</th>
-          <th>Type</th>
-          <th>Rate</th>
-          <th>Active?</th>
-          <th>Bookings</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <% spots.forEach((s) => { %>
-          <tr>
-            <td>
-              <a href="/spots/<%= s.spot_id %>"><%= s.street %></a>
-              <div class="small text-muted"><%= s.city %></div>
-            </td>
-            <td><%= s.type_name %></td>
-            <td>$<%= Number(s.hourly_rate).toFixed(2) %></td>
-            <td>
+  <div class="row g-3 mb-5">
+    <% spots.forEach((s) => { %>
+      <div class="col-md-4 col-sm-6">
+        <div class="card h-100" style="border-color:<%= s.is_active ? 'var(--border)' : 'rgba(248,113,113,0.2)' %>">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <span class="badge bg-secondary"><%= s.type_name %></span>
               <% if (s.is_active) { %>
                 <span class="badge bg-success">Active</span>
               <% } else { %>
-                <span class="badge bg-secondary">Inactive</span>
+                <span class="badge bg-danger">Inactive</span>
               <% } %>
-            </td>
-            <td><%= s.total_bookings %></td>
-            <td>
-              <a href="/spots/<%= s.spot_id %>/edit" class="btn btn-sm btn-outline-primary">Edit</a>
-            </td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
+            </div>
+            <h6 style="font-family:'Barlow Condensed';font-size:1.05rem;font-weight:700;color:var(--text);margin-bottom:2px"><%= s.street %></h6>
+            <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:10px"><%= s.city %></p>
+            <div class="d-flex justify-content-between align-items-center">
+              <span style="font-family:'Barlow Condensed';font-size:1.2rem;font-weight:700;color:var(--accent)">
+                $<%= Number(s.hourly_rate).toFixed(2) %><span style="font-family:'DM Sans';font-size:0.75rem;font-weight:400;color:var(--text-muted)">/hr</span>
+              </span>
+              <span style="font-size:0.75rem;color:var(--text-muted)"><%= s.total_bookings %> booking<%= s.total_bookings == 1 ? '' : 's' %></span>
+            </div>
+          </div>
+          <div class="card-body" style="padding-top:0;border-top:1px solid var(--border)">
+            <a href="/spots/<%= s.spot_id %>/edit" class="btn btn-outline-primary btn-sm w-100">Edit</a>
+          </div>
+        </div>
+      </div>
+    <% }) %>
   </div>
 <% } %>
 
-<h4 class="mt-5">Incoming bookings</h4>
+<!-- ── Incoming bookings ───────────────────────────────────── -->
+<div class="d-flex align-items-center gap-3 mb-3">
+  <h4 style="font-family:'Barlow Condensed';font-size:1.4rem;font-weight:700;margin:0">Incoming bookings</h4>
+  <% const pending = bookings.filter(b => b.status_name === 'Pending').length;
+     if (pending) { %>
+    <span class="badge bg-warning"><%= pending %> pending</span>
+  <% } %>
+</div>
+
 <% if (!bookings.length) { %>
-  <p class="text-muted">No bookings yet.</p>
+  <p style="color:var(--text-muted);margin-bottom:3rem">No bookings yet.</p>
 <% } else { %>
-  <div class="table-responsive">
-    <table class="table bg-white shadow-sm align-middle">
+  <div class="table-responsive mb-5">
+    <table class="table">
       <thead>
         <tr>
-          <th>When</th>
-          <th>Spot</th>
           <th>Renter</th>
+          <th>Spot</th>
+          <th>When</th>
           <th>Vehicle</th>
           <th>Total</th>
           <th>Status</th>
@@ -75,26 +81,33 @@
         <% bookings.forEach((b) => { %>
           <tr>
             <td>
-              <%= new Date(b.start_time).toLocaleString() %>
-              <div class="small text-muted">→ <%= new Date(b.end_time).toLocaleString() %></div>
+              <div style="font-weight:500"><%= b.renter_first %> <%= b.renter_last %></div>
+              <div style="font-size:0.75rem;color:var(--text-muted)"><%= b.email %></div>
             </td>
-            <td><%= b.street %></td>
-            <td>
-              <%= b.renter_first %> <%= b.renter_last %>
-              <div class="small text-muted"><%= b.email %></div>
+            <td style="font-size:0.85rem"><%= b.street %></td>
+            <td style="font-size:0.8rem">
+              <div><%= new Date(b.start_time).toLocaleDateString('en-US',{month:'short',day:'numeric'}) %></div>
+              <div style="color:var(--text-muted)">
+                <%= new Date(b.start_time).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}) %>
+                → <%= new Date(b.end_time).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}) %>
+              </div>
             </td>
-            <td>
+            <td style="font-size:0.85rem">
               <%= b.make %> <%= b.model %>
-              <% if (b.license_plate) { %><div class="small text-muted"><%= b.license_plate %></div><% } %>
+              <% if (b.license_plate) { %>
+                <div style="font-size:0.75rem;color:var(--text-muted)"><%= b.license_plate %></div>
+              <% } %>
             </td>
-            <td>$<%= Number(b.total_cost).toFixed(2) %></td>
+            <td style="font-family:'Barlow Condensed';font-size:1.1rem;font-weight:600;color:var(--accent)">
+              $<%= Number(b.total_cost).toFixed(2) %>
+            </td>
             <td>
-              <span class="badge bg-<%= {Pending:'warning',Confirmed:'primary',Completed:'success',Cancelled:'secondary'}[b.status_name] || 'light' %>">
+              <span class="badge bg-<%= {Pending:'warning',Confirmed:'primary',Completed:'success',Cancelled:'secondary'}[b.status_name] || 'secondary' %>">
                 <%= b.status_name %>
               </span>
             </td>
-            <td class="text-nowrap">
-              <a href="/reservations/<%= b.reservation_id %>" class="btn btn-sm btn-outline-primary">View</a>
+            <td class="text-nowrap" style="white-space:nowrap">
+              <a href="/reservations/<%= b.reservation_id %>" class="btn btn-sm btn-outline-secondary">View</a>
               <% if (b.status_name === 'Pending') { %>
                 <button class="btn btn-sm btn-primary" data-status-action="confirm" data-res-id="<%= b.reservation_id %>">Confirm</button>
               <% } else if (b.status_name === 'Confirmed') { %>
@@ -108,21 +121,28 @@
   </div>
 <% } %>
 
-<h4 class="mt-5">Reviews</h4>
+<!-- ── Reviews ─────────────────────────────────────────────── -->
+<h4 style="font-family:'Barlow Condensed';font-size:1.4rem;font-weight:700;margin-bottom:1rem">Reviews</h4>
+
 <% if (!reviews.length) { %>
-  <p class="text-muted">No reviews yet.</p>
+  <p style="color:var(--text-muted)">No reviews yet.</p>
 <% } else { %>
   <div class="row g-3">
     <% reviews.forEach((rv) => { %>
       <div class="col-md-6">
         <div class="card">
           <div class="card-body">
-            <div class="d-flex justify-content-between">
-              <strong><%= '⭐'.repeat(rv.rating) %></strong>
-              <small class="text-muted"><%= new Date(rv.created_at).toLocaleDateString() %></small>
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <div>
+                <% for(let i=0;i<rv.rating;i++) { %><span style="color:var(--accent-yellow);font-size:0.9rem">★</span><% } %>
+                <% for(let i=rv.rating;i<5;i++) { %><span style="color:var(--text-subtle);font-size:0.9rem">★</span><% } %>
+              </div>
+              <span style="font-size:0.75rem;color:var(--text-muted)"><%= new Date(rv.created_at).toLocaleDateString() %></span>
             </div>
-            <p class="mb-1 mt-2"><%= rv.comment %></p>
-            <small class="text-muted">— <%= rv.renter_first %> <%= rv.renter_last %> · <%= rv.street %></small>
+            <p style="color:var(--text);font-size:0.875rem;margin-bottom:8px"><%= rv.comment || '—' %></p>
+            <p style="font-size:0.75rem;color:var(--text-muted);margin:0">
+              — <%= rv.renter_first %> <%= rv.renter_last %> &middot; <%= rv.street %>
+            </p>
           </div>
         </div>
       </div>

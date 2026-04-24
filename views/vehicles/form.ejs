@@ -1,41 +1,53 @@
 <div class="row justify-content-center">
-  <div class="col-md-8">
-    <div class="card shadow-sm">
-      <div class="card-body p-4">
-        <h2 class="mb-4">Add a vehicle</h2>
-        <% if (errors && errors.length) { %>
-          <div class="alert alert-danger">
-            <ul class="mb-0">
-              <% errors.forEach((e) => { %><li><%= e.msg %></li><% }) %>
-            </ul>
-          </div>
-        <% } %>
-        <form method="post" action="/vehicles">
-          <h5>Vehicle</h5>
-          <div class="row g-3 mb-3">
+  <div class="col-lg-7">
+    <div class="mb-4">
+      <h1 style="font-family:'Barlow Condensed';font-size:2.4rem;font-weight:800;margin-bottom:4px">Add a vehicle</h1>
+      <p style="color:var(--text-muted);margin:0">Register your car to start booking spots.</p>
+    </div>
+
+    <% if (errors && errors.length) { %>
+      <div class="alert alert-danger mb-4">
+        <ul class="mb-0 ps-3">
+          <% errors.forEach((e) => { %><li><%= e.msg %></li><% }) %>
+        </ul>
+      </div>
+    <% } %>
+
+    <form method="post" action="/vehicles">
+      <!-- Vehicle -->
+      <div class="card mb-4">
+        <div class="card-body">
+          <p style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:14px">Vehicle</p>
+          <div class="row g-3">
             <div class="col-md-6">
               <label class="form-label">Make</label>
-              <input name="make" class="form-control" required value="<%= form.make || '' %>" />
+              <input name="make" class="form-control" required value="<%= form.make || '' %>" placeholder="Toyota" />
             </div>
             <div class="col-md-6">
               <label class="form-label">Model</label>
-              <input name="model" class="form-control" required value="<%= form.model || '' %>" />
+              <input name="model" class="form-control" required value="<%= form.model || '' %>" placeholder="Camry" />
             </div>
             <div class="col-md-4">
               <label class="form-label">Year</label>
-              <input name="year" type="number" class="form-control" value="<%= form.year || '' %>" />
+              <input name="year" type="number" class="form-control" value="<%= form.year || '' %>" placeholder="2021" />
             </div>
-            <div class="col-md-4">
+            <div class="col-md-8">
               <label class="form-label">Color</label>
-              <input name="color" class="form-control" value="<%= form.color || '' %>" />
+              <input name="color" class="form-control" value="<%= form.color || '' %>" placeholder="Silver" />
             </div>
           </div>
+        </div>
+      </div>
 
-          <h5>Registration (optional)</h5>
+      <!-- Registration -->
+      <div class="card mb-4">
+        <div class="card-body">
+          <p style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:4px">Registration</p>
+          <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:14px">Optional — hosts can see your plate when you book.</p>
           <div class="row g-3">
             <div class="col-md-6">
               <label class="form-label">License plate</label>
-              <input name="license_plate" class="form-control" value="<%= form.license_plate || '' %>" />
+              <input name="license_plate" class="form-control" value="<%= form.license_plate || '' %>" placeholder="VA-ABC123" />
             </div>
             <div class="col-md-3">
               <label class="form-label">State</label>
@@ -46,13 +58,13 @@
               <input name="expires_on" type="date" class="form-control" value="<%= form.expires_on || '' %>" />
             </div>
           </div>
-
-          <div class="mt-4 d-flex gap-2">
-            <button class="btn btn-primary">Add vehicle</button>
-            <a href="/vehicles" class="btn btn-outline-secondary">Cancel</a>
-          </div>
-        </form>
+        </div>
       </div>
-    </div>
+
+      <div class="d-flex gap-2">
+        <button class="btn btn-primary" type="submit" style="padding:10px 28px">Add vehicle</button>
+        <a href="/vehicles" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
   </div>
 </div>
