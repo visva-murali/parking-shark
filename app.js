@@ -66,6 +66,7 @@ app.use((req, res, next) => {
 // ---------- Routes ----------
 app.get('/', (req, res) => {
   if (req.session.user) return res.redirect('/spots');
+  res.locals.noContainer = true;
   res.render('home', { title: 'Parking Shark' });
 });
 

@@ -208,6 +208,19 @@ router.get('/:id', async (req, res, next) => {
         WHERE u.user_id = ?`,
       [spotRows[0].host_id],
     );
+    // §4.3 (M2) — individual reviews for this spot
+    const [spotReviews] = await pool.query(
+      `SELECT rv.rating, rv.comment, rv.created_at,
+              u.first_name AS renter_first, u.last_name AS renter_last
+         FROM reviews rv
+         JOIN reservations r ON rv.reservation_id = r.reservation_id
+         JOIN users u        ON r.renter_user_id  = u.user_id
+        WHERE r.spot_id = ?
+        ORDER BY rv.created_at DESC
+        LIMIT 10`,
+      [spotId],
+    );
+
     // Renter's vehicles for the booking form
     let vehicles = [];
     if (req.session.user) {
@@ -226,6 +239,7 @@ router.get('/:id', async (req, res, next) => {
       photos,
       windows,
       rating,
+      spotReviews,
       vehicles,
       isOwner: req.session.user && req.session.user.user_id === spotRows[0].host_id,
     });

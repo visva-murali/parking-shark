@@ -67,13 +67,28 @@
   </form>
 </details>
 
+<!-- Live price filter -->
+<% if (spots.length) { %>
+  <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;padding:12px 16px;background:var(--off-white);border-radius:var(--radius);border:1px solid var(--border-light)">
+    <label style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);white-space:nowrap">
+      Max price
+    </label>
+    <input type="range" id="live-price-filter" min="0" max="20" step="0.5" value="20"
+           style="flex:1;accent-color:var(--accent);cursor:pointer" />
+    <span id="live-price-label" style="font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;min-width:72px;text-align:right">
+      Any price
+    </span>
+    <span id="live-spot-count" style="font-size:12px;color:var(--text-3);white-space:nowrap"></span>
+  </div>
+<% } %>
+
 <!-- Spot grid -->
 <% if (!spots.length) { %>
   <div class="alert alert-info">No spots match your filters. Try adjusting your search.</div>
 <% } else { %>
-  <div class="row g-4">
+  <div class="row g-4" id="spots-grid">
     <% spots.forEach((s) => { %>
-      <div class="col-6 col-md-4 col-xl-3">
+      <div class="col-6 col-md-4 col-xl-3" data-price="<%= Number(s.hourly_rate).toFixed(2) %>">
         <a href="/spots/<%= s.spot_id %>" style="text-decoration:none;display:block">
           <div class="spot-card">
             <div class="spot-card-img-wrap">

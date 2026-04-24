@@ -55,6 +55,37 @@
       <hr class="ps-divider" />
     <% } %>
 
+    <!-- Reviews -->
+    <% if (spotReviews.length) { %>
+      <div style="margin-bottom:24px">
+        <h3 style="font-size:17px;font-weight:600;color:var(--text);margin-bottom:14px">
+          Reviews
+          <span style="font-size:14px;font-weight:400;color:var(--text-3);margin-left:6px">
+            <% if (rating.avg_rating) { %>★ <%= rating.avg_rating %> · <%= rating.total_reviews %> review<%= rating.total_reviews === 1 ? '' : 's' %><% } %>
+          </span>
+        </h3>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <% spotReviews.forEach((rv) => { %>
+            <div style="border-bottom:1px solid var(--border-light);padding-bottom:14px">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+                <div>
+                  <span style="font-weight:600;font-size:14px;color:var(--text)"><%= rv.renter_first %></span>
+                  <span style="color:#F59E0B;font-size:12px;letter-spacing:1px;margin-left:8px">
+                    <%= '★'.repeat(rv.rating) %><%= '☆'.repeat(5-rv.rating) %>
+                  </span>
+                </div>
+                <span style="font-size:12px;color:var(--text-3)"><%= new Date(rv.created_at).toLocaleDateString('en-US',{month:'short',year:'numeric'}) %></span>
+              </div>
+              <% if (rv.comment) { %>
+                <p style="font-size:14px;color:var(--text-2);line-height:1.55;margin:0"><%= rv.comment %></p>
+              <% } %>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+      <hr class="ps-divider" />
+    <% } %>
+
     <!-- Availability -->
     <div style="margin-bottom:24px">
       <h3 style="font-size:17px;font-weight:600;color:var(--text);margin-bottom:12px">Availability</h3>

@@ -1,7 +1,8 @@
-// Client-side dynamic behavior. Kept intentionally small.
+// Client-side dynamic behavior.
 //
 // 1. Live total-cost preview on the booking form.
 // 2. Inline status updates on the host dashboard.
+// 3. Live price-range filter on the browse page.
 
 document.addEventListener('DOMContentLoaded', () => {
   // --- Booking form: live total cost ---
@@ -26,6 +27,31 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     start?.addEventListener('input', update);
     end?.addEventListener('input', update);
+  }
+
+  // --- Browse page: live price-range filter ---
+  const priceSlider = document.getElementById('live-price-filter');
+  if (priceSlider) {
+    const label = document.getElementById('live-price-label');
+    const countEl = document.getElementById('live-spot-count');
+    const cards = document.querySelectorAll('[data-price]');
+    const max = parseFloat(priceSlider.max);
+
+    const applyFilter = () => {
+      const val = parseFloat(priceSlider.value);
+      label.textContent = val >= max ? 'Any price' : `Up to $${val.toFixed(2)}/hr`;
+      let visible = 0;
+      cards.forEach((card) => {
+        const price = parseFloat(card.dataset.price);
+        const show = val >= max || price <= val;
+        card.style.display = show ? '' : 'none';
+        if (show) visible++;
+      });
+      countEl.textContent = visible < cards.length ? `${visible} of ${cards.length} shown` : '';
+    };
+
+    priceSlider.addEventListener('input', applyFilter);
+    applyFilter();
   }
 
   // --- Host dashboard: inline status buttons ---
