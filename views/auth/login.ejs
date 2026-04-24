@@ -1,27 +1,36 @@
-<div class="row justify-content-center" style="margin-top:3rem">
-  <div class="col-md-4 col-sm-10">
-    <div class="auth-card">
-      <div class="mb-4">
-        <h2 style="font-family:'Barlow Condensed';font-size:2rem;font-weight:700;margin-bottom:4px">Welcome back</h2>
-        <p style="color:var(--text-muted);font-size:0.875rem;margin:0">Sign in to your Parking Shark account.</p>
-      </div>
-      <% if (error) { %>
-        <div class="alert alert-danger mb-3"><%= error %></div>
-      <% } %>
-      <form method="post" action="/login">
-        <div class="mb-3">
-          <label class="form-label">Email</label>
-          <input type="email" name="email" class="form-control" value="<%= form.email || '' %>" required autofocus />
-        </div>
-        <div class="mb-4">
-          <label class="form-label">Password</label>
-          <input type="password" name="password" class="form-control" required />
-        </div>
-        <button class="btn btn-primary w-100" type="submit" style="padding:11px">Log in</button>
-      </form>
-      <p style="text-align:center;margin-top:1.25rem;margin-bottom:0;font-size:0.85rem;color:var(--text-muted)">
-        No account? <a href="/register" style="color:var(--accent);text-decoration:none">Sign up</a>
-      </p>
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div style="text-align:center;margin-bottom:28px">
+      <div style="font-size:28px;margin-bottom:10px">🦈</div>
+      <h1 style="font-size:22px;font-weight:700;color:var(--text);margin-bottom:6px">Welcome back</h1>
+      <p style="font-size:14px;color:var(--text-3)">Log in to your Parking Shark account</p>
     </div>
+
+    <% if (error) { %>
+      <div class="alert alert-danger mb-4" style="font-size:13.5px"><%= error %></div>
+    <% } %>
+
+    <form method="post" action="/login">
+      <div class="mb-3">
+        <label class="form-label">Email address</label>
+        <input type="email" name="email" class="form-control" value="<%= form.email || '' %>"
+               required autofocus placeholder="you@virginia.edu" />
+      </div>
+      <div class="mb-4">
+        <label class="form-label">Password</label>
+        <input type="password" name="password" class="form-control" required placeholder="Your password" />
+      </div>
+      <button class="btn btn-primary w-100" type="submit"
+              style="border-radius:var(--radius);padding:13px;font-size:15px">
+        Continue
+      </button>
+    </form>
+
+    <div class="auth-divider">or</div>
+
+    <p style="text-align:center;font-size:14px;color:var(--text-3)">
+      Don't have an account?&nbsp;
+      <a href="/register" style="color:var(--text);font-weight:700;text-decoration:underline">Sign up</a>
+    </p>
   </div>
 </div>

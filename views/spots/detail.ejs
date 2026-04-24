@@ -1,111 +1,115 @@
-<div class="row g-4">
-  <!-- Left column -->
+<div class="row g-5">
+  <!-- LEFT: details -->
   <div class="col-lg-7">
-    <!-- Header -->
-    <div class="mb-3">
-      <div class="d-flex align-items-center gap-2 mb-1">
-        <span class="badge bg-secondary"><%= spot.type_name %></span>
-        <% if (!spot.is_active) { %><span class="badge bg-danger">Inactive</span><% } %>
-      </div>
-      <h1 style="font-family:'Barlow Condensed';font-size:2.4rem;font-weight:800;margin:0"><%= spot.street %></h1>
-      <p style="color:var(--text-muted);margin:4px 0 0"><%= spot.city %>, <%= spot.state %> <%= spot.zip_code %></p>
-    </div>
-
-    <!-- Price -->
-    <div class="ps-detail-price mb-4">
-      $<%= Number(spot.hourly_rate).toFixed(2) %><span> / hr</span>
-    </div>
-
-    <!-- Photos -->
-    <% if (photos.length) { %>
-      <div class="row g-2 mb-4">
-        <% photos.forEach((p) => { %>
-          <div class="col-4 position-relative">
-            <img src="<%= p.photo_url %>" class="img-fluid rounded" style="height:130px;object-fit:cover;width:100%" alt="photo" onerror="this.parentElement.style.display='none'" />
-            <% if (isOwner) { %>
-              <form method="post" action="/spots/<%= spot.spot_id %>/photos/<%= p.photo_id %>/delete" class="position-absolute top-0 end-0 m-1">
-                <button class="btn btn-sm btn-danger" style="width:24px;height:24px;padding:0;font-size:0.75rem;line-height:1">&times;</button>
-              </form>
-            <% } %>
-          </div>
+    <!-- Photo grid -->
+    <% if (photos.length >= 3) { %>
+      <div class="ps-detail-photo-grid">
+        <% photos.slice(0,3).forEach((p, i) => { %>
+          <img src="<%= p.photo_url %>" alt="Spot photo" loading="lazy"
+               onerror="this.style.background='var(--off-white)'" />
         <% }) %>
       </div>
-    <% } %>
-
-    <!-- Instructions -->
-    <% if (spot.instructions) { %>
-      <div class="card mb-3">
-        <div class="card-body">
-          <p style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:6px">Host instructions</p>
-          <p style="color:var(--text);margin:0"><%= spot.instructions %></p>
-        </div>
+    <% } else if (photos.length) { %>
+      <div class="ps-detail-photo-single">
+        <img src="<%= photos[0].photo_url %>" alt="Spot photo" style="width:100%;height:100%;object-fit:cover"
+             onerror="this.parentElement.style.background='var(--off-white)'" />
+      </div>
+    <% } else { %>
+      <div class="ps-detail-photo-single" style="background:var(--off-white);display:flex;align-items:center;justify-content:center;font-size:3rem;color:var(--text-4)">
+        🅿️
       </div>
     <% } %>
 
-    <!-- Host info -->
-    <div class="card mb-3">
-      <div class="card-body d-flex justify-content-between align-items-center">
-        <div>
-          <p style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:3px">Host</p>
-          <p style="color:var(--text);font-weight:500;margin:0"><%= spot.host_first %> <%= spot.host_last %></p>
-        </div>
-        <div class="text-end">
-          <% if (rating.avg_rating) { %>
-            <span class="star-rating">⭐</span>
-            <strong><%= rating.avg_rating %></strong>
-            <span style="font-size:0.8rem;color:var(--text-muted)">(<%= rating.total_reviews %>)</span>
-          <% } else { %>
-            <span style="font-size:0.8rem;color:var(--text-muted)">No reviews yet</span>
-          <% } %>
-        </div>
-      </div>
+    <!-- Title & type -->
+    <div style="margin-bottom:20px">
+      <h1 style="font-size:26px;font-weight:700;color:var(--text);letter-spacing:-0.01em;margin-bottom:6px">
+        <%= spot.street %>
+      </h1>
+      <p style="font-size:15px;color:var(--text-3)">
+        <%= spot.city %>, <%= spot.state %> · <%= spot.type_name %>
+        <% if (!spot.is_active) { %>&nbsp;<span class="badge bg-danger">Inactive</span><% } %>
+      </p>
     </div>
 
-    <!-- Availability -->
-    <div class="card mb-3">
-      <div class="card-body">
-        <p style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:10px">Availability</p>
-        <% if (!windows.length) { %>
-          <p style="color:var(--text-muted);font-size:0.875rem;margin:0">No windows set by host.</p>
+    <!-- Host row -->
+    <div class="ps-host-row">
+      <div class="ps-host-avatar">👤</div>
+      <div>
+        <p style="font-size:14px;font-weight:600;color:var(--text);margin:0">Hosted by <%= spot.host_first %> <%= spot.host_last %></p>
+        <% if (rating.avg_rating) { %>
+          <p style="font-size:13px;color:var(--text-3);margin:0">
+            ★ <%= rating.avg_rating %> · <%= rating.total_reviews %> review<%= rating.total_reviews === 1 ? '' : 's' %>
+          </p>
         <% } else { %>
-          <div style="display:flex;flex-direction:column;gap:6px">
-            <% windows.forEach((w) => { %>
-              <div class="d-flex align-items-center justify-content-between" style="font-size:0.85rem">
-                <div class="d-flex align-items-center gap-2">
-                  <span class="avail-pill <%= w.availability_kind === 'Available' ? 'available' : 'blocked' %>">
-                    <%= w.availability_kind %>
-                  </span>
-                  <span style="color:var(--text-muted)"><%= new Date(w.start_time).toLocaleString() %> → <%= new Date(w.end_time).toLocaleString() %></span>
-                </div>
-                <% if (isOwner) { %>
-                  <form method="post" action="/spots/<%= spot.spot_id %>/availability/<%= w.window_id %>/delete" class="d-inline">
-                    <button class="btn btn-link btn-sm text-danger p-0" style="font-size:0.75rem">remove</button>
-                  </form>
-                <% } %>
-              </div>
-            <% }) %>
-          </div>
+          <p style="font-size:13px;color:var(--text-3);margin:0">No reviews yet</p>
         <% } %>
       </div>
     </div>
 
+    <!-- Instructions -->
+    <% if (spot.instructions) { %>
+      <div style="margin-bottom:24px">
+        <h3 style="font-size:17px;font-weight:600;color:var(--text);margin-bottom:10px">About this spot</h3>
+        <p style="font-size:15px;color:var(--text-2);line-height:1.65"><%= spot.instructions %></p>
+      </div>
+      <hr class="ps-divider" />
+    <% } %>
+
+    <!-- Availability -->
+    <div style="margin-bottom:24px">
+      <h3 style="font-size:17px;font-weight:600;color:var(--text);margin-bottom:12px">Availability</h3>
+      <% if (!windows.length) { %>
+        <p style="font-size:14px;color:var(--text-3)">No availability windows set by host.</p>
+      <% } else { %>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <% windows.forEach((w) => { %>
+            <div style="display:flex;align-items:center;justify-content:space-between;font-size:13.5px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <span class="avail-pill <%= w.availability_kind === 'Available' ? 'available' : 'blocked' %>">
+                  <%= w.availability_kind %>
+                </span>
+                <span style="color:var(--text-3)">
+                  <%= new Date(w.start_time).toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) %>
+                  → <%= new Date(w.end_time).toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) %>
+                </span>
+              </div>
+              <% if (isOwner) { %>
+                <form method="post" action="/spots/<%= spot.spot_id %>/availability/<%= w.window_id %>/delete">
+                  <button class="btn-link" style="font-size:12px;color:var(--text-3)">Remove</button>
+                </form>
+              <% } %>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+
     <!-- Owner controls -->
     <% if (isOwner) { %>
-      <div class="card mb-3">
-        <div class="card-body">
-          <p style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:10px">Add availability window</p>
-          <form method="post" action="/spots/<%= spot.spot_id %>/availability">
+      <hr class="ps-divider" />
+      <div style="margin-bottom:24px">
+        <h3 style="font-size:17px;font-weight:600;color:var(--text);margin-bottom:12px">Manage listing</h3>
+        <div class="d-flex gap-2 flex-wrap mb-4">
+          <a class="btn btn-outline btn-sm" href="/spots/<%= spot.spot_id %>/edit">Edit listing</a>
+          <form method="post" action="/spots/<%= spot.spot_id %>/deactivate" class="d-inline">
+            <button class="btn btn-outline btn-sm" style="border-color:var(--warning-c);color:var(--warning-c)">Deactivate</button>
+          </form>
+          <form method="post" action="/spots/<%= spot.spot_id %>/delete" class="d-inline"
+                onsubmit="return confirm('Delete this listing?')">
+            <button class="btn btn-outline btn-sm" style="border-color:var(--danger-c);color:var(--danger-c)">Delete</button>
+          </form>
+        </div>
+
+        <!-- Add availability -->
+        <details style="margin-bottom:16px">
+          <summary style="cursor:pointer;font-size:13.5px;font-weight:600;color:var(--accent)">+ Add availability window</summary>
+          <form method="post" action="/spots/<%= spot.spot_id %>/availability" style="margin-top:12px">
             <div class="row g-2 align-items-end">
-              <div class="col-md-4">
-                <label class="form-label">Start</label>
-                <input type="datetime-local" name="start_time" class="form-control" required />
-              </div>
-              <div class="col-md-4">
-                <label class="form-label">End</label>
-                <input type="datetime-local" name="end_time" class="form-control" required />
-              </div>
-              <div class="col-md-2">
-                <label class="form-label">Kind</label>
+              <div class="col-md-4"><label class="form-label">Start</label>
+                <input type="datetime-local" name="start_time" class="form-control" required /></div>
+              <div class="col-md-4"><label class="form-label">End</label>
+                <input type="datetime-local" name="end_time" class="form-control" required /></div>
+              <div class="col-md-2"><label class="form-label">Type</label>
                 <select name="availability_kind" class="form-select">
                   <option value="Available">Available</option>
                   <option value="Blocked">Blocked</option>
@@ -114,50 +118,86 @@
               <div class="col-md-2"><button class="btn btn-primary w-100">Add</button></div>
             </div>
           </form>
-        </div>
-      </div>
-      <div class="card mb-3">
-        <div class="card-body">
-          <p style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:8px">Add photo</p>
-          <form method="post" action="/spots/<%= spot.spot_id %>/photos" class="d-flex gap-2">
+        </details>
+
+        <!-- Add photo -->
+        <details>
+          <summary style="cursor:pointer;font-size:13.5px;font-weight:600;color:var(--accent)">+ Add photo</summary>
+          <form method="post" action="/spots/<%= spot.spot_id %>/photos" style="margin-top:12px" class="d-flex gap-2">
             <input name="photo_url" class="form-control" placeholder="https://…" required />
-            <button class="btn btn-primary">Add</button>
+            <button class="btn btn-primary" style="white-space:nowrap">Add photo</button>
           </form>
-        </div>
-      </div>
-      <div class="d-flex gap-2 flex-wrap">
-        <a class="btn btn-outline-primary btn-sm" href="/spots/<%= spot.spot_id %>/edit">Edit listing</a>
-        <form method="post" action="/spots/<%= spot.spot_id %>/deactivate" class="d-inline">
-          <button class="btn btn-outline-warning btn-sm">Deactivate</button>
-        </form>
-        <form method="post" action="/spots/<%= spot.spot_id %>/delete" class="d-inline" onsubmit="return confirm('Delete permanently?')">
-          <button class="btn btn-outline-danger btn-sm">Delete</button>
-        </form>
+          <% if (photos.length) { %>
+            <div class="d-flex flex-wrap gap-2 mt-3">
+              <% photos.forEach((p) => { %>
+                <div style="position:relative">
+                  <img src="<%= p.photo_url %>" style="width:72px;height:52px;object-fit:cover;border-radius:6px;border:1px solid var(--border-light)"
+                       onerror="this.parentElement.style.display='none'" />
+                  <form method="post" action="/spots/<%= spot.spot_id %>/photos/<%= p.photo_id %>/delete"
+                        style="position:absolute;top:-5px;right:-5px">
+                    <button style="width:18px;height:18px;border-radius:50%;background:var(--text);color:#fff;border:none;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0">✕</button>
+                  </form>
+                </div>
+              <% }) %>
+            </div>
+          <% } %>
+        </details>
       </div>
     <% } %>
   </div>
 
-  <!-- Right column: booking widget -->
+  <!-- RIGHT: booking widget -->
   <div class="col-lg-5">
-    <div class="card booking-card sticky-top">
-      <div class="card-body p-4">
-        <h5 style="font-family:'Barlow Condensed';font-size:1.3rem;font-weight:700;margin-bottom:1.2rem">Reserve this spot</h5>
-        <% if (!currentUser) { %>
-          <p style="color:var(--text-muted)">Please <a href="/login" style="color:var(--accent)">log in</a> to book.</p>
-        <% } else if (isOwner) { %>
-          <p style="color:var(--text-muted)">You own this spot.</p>
-        <% } else if (!vehicles.length) { %>
-          <p style="color:var(--text-muted)">
-            Add a vehicle first: <a href="/vehicles/new" style="color:var(--accent)">+ Add a vehicle</a>.
-          </p>
-        <% } else if (!spot.is_active) { %>
-          <p style="color:var(--text-muted)">This spot is currently inactive.</p>
-        <% } else { %>
-          <form method="post" action="/reservations" data-booking-form data-hourly-rate="<%= spot.hourly_rate %>">
-            <input type="hidden" name="spot_id" value="<%= spot.spot_id %>" />
-            <div class="mb-3">
-              <label class="form-label">Vehicle</label>
-              <select name="vehicle_id" class="form-select" required>
+    <div class="ps-booking-card">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:20px">
+        <div>
+          <span style="font-size:22px;font-weight:700;color:var(--text)">$<%= Number(spot.hourly_rate).toFixed(2) %></span>
+          <span style="font-size:14px;color:var(--text-3)"> / hour</span>
+        </div>
+        <% if (rating.avg_rating) { %>
+          <span style="font-size:13px;color:var(--text-2);font-weight:500">★ <%= rating.avg_rating %></span>
+        <% } %>
+      </div>
+
+      <% if (!currentUser) { %>
+        <p style="font-size:14px;color:var(--text-3);margin-bottom:16px">
+          <a href="/login" style="color:var(--accent);font-weight:600;text-decoration:none">Log in</a> to reserve this spot.
+        </p>
+        <a href="/login" class="btn btn-primary w-100 btn-lg">Log in to book</a>
+      <% } else if (isOwner) { %>
+        <div style="text-align:center;padding:20px 0;color:var(--text-3);font-size:14px">
+          This is your listing.
+          <div style="margin-top:8px"><a href="/spots/<%= spot.spot_id %>/edit" style="color:var(--accent);font-weight:600;text-decoration:none">Edit listing →</a></div>
+        </div>
+      <% } else if (!vehicles.length) { %>
+        <p style="font-size:14px;color:var(--text-3);margin-bottom:16px">Add a vehicle before booking.</p>
+        <a href="/vehicles/new" class="btn btn-primary w-100">Add a vehicle</a>
+      <% } else if (!spot.is_active) { %>
+        <p style="font-size:14px;color:var(--text-3);text-align:center;padding:16px 0">
+          This spot is not currently active.
+        </p>
+      <% } else { %>
+        <form method="post" action="/reservations" data-booking-form data-hourly-rate="<%= spot.hourly_rate %>">
+          <input type="hidden" name="spot_id" value="<%= spot.spot_id %>" />
+
+          <!-- Date-time inputs styled like Airbnb check-in/check-out -->
+          <div style="border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:12px">
+            <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1.5px solid var(--border)">
+              <div style="padding:10px 14px;border-right:1px solid var(--border)">
+                <label class="form-label" style="margin-bottom:2px">START</label>
+                <input type="datetime-local" name="start_time" class="form-control"
+                       style="border:none;padding:0;font-size:13px;font-weight:500;outline:none;box-shadow:none" required />
+              </div>
+              <div style="padding:10px 14px">
+                <label class="form-label" style="margin-bottom:2px">END</label>
+                <input type="datetime-local" name="end_time" class="form-control"
+                       style="border:none;padding:0;font-size:13px;font-weight:500;outline:none;box-shadow:none" required />
+              </div>
+            </div>
+            <div style="padding:10px 14px">
+              <label class="form-label" style="margin-bottom:2px">VEHICLE</label>
+              <select name="vehicle_id" class="form-select"
+                      style="border:none;padding:0;font-size:13px;font-weight:500;outline:none;box-shadow:none;background:none" required>
                 <% vehicles.forEach((v) => { %>
                   <option value="<%= v.vehicle_id %>">
                     <%= v.year || '' %> <%= v.make %> <%= v.model %><% if (v.license_plate) { %> · <%= v.license_plate %><% } %>
@@ -165,31 +205,29 @@
                 <% }) %>
               </select>
             </div>
-            <div class="mb-3">
-              <label class="form-label">Start time</label>
-              <input type="datetime-local" name="start_time" class="form-control" required />
-            </div>
-            <div class="mb-3">
-              <label class="form-label">End time</label>
-              <input type="datetime-local" name="end_time" class="form-control" required />
-            </div>
-            <div class="mb-4">
-              <label class="form-label">Payment</label>
-              <select name="payment_method" class="form-select">
-                <option>Credit Card</option>
-                <option>Debit Card</option>
-                <option>PayPal</option>
-                <option>Venmo</option>
-              </select>
-            </div>
-            <div class="booking-card total-display mb-3">
-              <span style="font-size:0.8rem;color:var(--text-muted)">Estimated total</span>
-              <strong data-total-cost>—</strong>
-            </div>
-            <button class="btn btn-primary w-100" type="submit" style="padding:12px;font-size:1rem">Book now</button>
-          </form>
-        <% } %>
-      </div>
+          </div>
+
+          <div style="margin-bottom:12px">
+            <label class="form-label">PAYMENT METHOD</label>
+            <select name="payment_method" class="form-select">
+              <option>Credit Card</option>
+              <option>Debit Card</option>
+              <option>PayPal</option>
+              <option>Venmo</option>
+            </select>
+          </div>
+
+          <button class="btn btn-primary w-100 btn-lg" type="submit" style="border-radius:var(--radius)">Reserve</button>
+        </form>
+
+        <!-- Live cost preview -->
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border-light)">
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:14px;color:var(--text-3)">
+            <span>Estimated total</span>
+            <span data-total-cost style="font-weight:600;color:var(--text)">—</span>
+          </div>
+        </div>
+      <% } %>
     </div>
   </div>
 </div>

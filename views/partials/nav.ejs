@@ -1,30 +1,50 @@
-<nav class="ps-navbar">
+<nav class="ps-nav">
   <div class="container">
-    <a class="ps-brand" href="/">
-      <span class="shark-icon">🦈</span>
+    <!-- Logo -->
+    <a class="ps-logo" href="/">
+      <svg viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="26" height="26" rx="6" fill="#E8472D"/>
+        <text x="5" y="19" font-size="14" fill="white">🦈</text>
+      </svg>
       Parking Shark
     </a>
 
-    <div class="ps-nav-links d-none d-md-flex">
-      <a class="ps-nav-link <%= path === '/spots' || path.startsWith('/spots') ? 'active' : '' %>" href="/spots">Find a spot</a>
+    <!-- Center links -->
+    <div class="ps-nav-links d-none d-lg-flex">
+      <a class="ps-nav-link <%= path === '/spots' || (path.startsWith('/spots') && !path.includes('/new')) ? 'active' : '' %>" href="/spots">Find a spot</a>
       <% if (currentUser) { %>
         <a class="ps-nav-link <%= path.startsWith('/dashboard/renter') ? 'active' : '' %>" href="/dashboard/renter">My bookings</a>
-        <a class="ps-nav-link <%= path.startsWith('/dashboard/host') ? 'active' : '' %>" href="/dashboard/host">My listings</a>
-        <a class="ps-nav-link <%= path.startsWith('/vehicles') ? 'active' : '' %>" href="/vehicles">Vehicles</a>
+        <a class="ps-nav-link <%= path.startsWith('/dashboard/host') ? 'active' : '' %>" href="/dashboard/host">Hosting</a>
       <% } %>
     </div>
 
+    <!-- Right side -->
     <div class="ps-nav-right">
       <% if (currentUser) { %>
-        <a class="ps-nav-link d-none d-sm-block" href="/profile">
-          <span class="ps-nav-user"><%= currentUser.first_name %></span>
-        </a>
-        <form action="/logout" method="post" class="d-inline">
-          <button class="btn btn-outline-secondary btn-sm" type="submit">Log out</button>
-        </form>
+        <a class="ps-nav-text-link d-none d-md-block" href="/spots/new">List your spot</a>
+        <div class="dropdown">
+          <button class="ps-nav-btn" data-bs-toggle="dropdown" aria-expanded="false">
+            <span style="font-size:13px;font-weight:500"><%= currentUser.first_name %></span>
+            <div class="ps-avatar"><%= currentUser.first_name[0].toUpperCase() %></div>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" style="border-radius:var(--radius-lg);border:1px solid var(--border-light);box-shadow:var(--shadow-lg);padding:8px;min-width:200px;font-family:'Plus Jakarta Sans',sans-serif">
+            <li><a class="dropdown-item" href="/dashboard/renter" style="border-radius:var(--radius-sm);font-size:14px;padding:9px 14px">My bookings</a></li>
+            <li><a class="dropdown-item" href="/dashboard/host" style="border-radius:var(--radius-sm);font-size:14px;padding:9px 14px">My listings</a></li>
+            <li><a class="dropdown-item" href="/vehicles" style="border-radius:var(--radius-sm);font-size:14px;padding:9px 14px">Vehicles</a></li>
+            <li><a class="dropdown-item" href="/profile" style="border-radius:var(--radius-sm);font-size:14px;padding:9px 14px">Account</a></li>
+            <li><hr class="dropdown-divider" style="border-color:var(--border-light);margin:6px 0"></li>
+            <li>
+              <form action="/logout" method="post">
+                <button type="submit" class="dropdown-item" style="border-radius:var(--radius-sm);font-size:14px;padding:9px 14px;color:var(--text-2);background:none;border:none;width:100%;text-align:left;cursor:pointer;font-family:inherit">
+                  Log out
+                </button>
+              </form>
+            </li>
+          </ul>
+        </div>
       <% } else { %>
-        <a class="ps-nav-link" href="/login">Log in</a>
-        <a class="btn btn-primary btn-sm" href="/register">Sign up</a>
+        <a class="ps-nav-text-link" href="/login">Log in</a>
+        <a class="btn btn-outline" href="/register" style="border-radius:var(--radius-pill);font-size:13.5px;padding:8px 18px">Sign up</a>
       <% } %>
     </div>
   </div>

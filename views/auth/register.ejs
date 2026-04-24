@@ -1,49 +1,57 @@
-<div class="row justify-content-center" style="margin-top:2rem">
-  <div class="col-md-6 col-sm-10">
-    <div class="auth-card">
-      <div class="mb-4">
-        <h2 style="font-family:'Barlow Condensed';font-size:2rem;font-weight:700;margin-bottom:4px">Create account</h2>
-        <p style="color:var(--text-muted);font-size:0.875rem;margin:0">Join the Charlottesville parking community.</p>
-      </div>
-      <% if (errors && errors.length) { %>
-        <div class="alert alert-danger mb-3">
-          <ul class="mb-0 ps-3">
-            <% errors.forEach((e) => { %><li><%= e.msg %><% if (e.path) { %> (<%= e.path %>)<% } %></li><% }) %>
-          </ul>
-        </div>
-      <% } %>
-      <form method="post" action="/register">
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label class="form-label">First name</label>
-            <input name="first_name" class="form-control" value="<%= form.first_name || '' %>" required />
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Last name</label>
-            <input name="last_name" class="form-control" value="<%= form.last_name || '' %>" required />
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Computing ID</label>
-            <input name="computing_id" class="form-control" value="<%= form.computing_id || '' %>" required />
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Phone <span style="color:var(--text-subtle)">(optional)</span></label>
-            <input name="phone_number" class="form-control" value="<%= form.phone_number || '' %>" />
-          </div>
-          <div class="col-12">
-            <label class="form-label">Email</label>
-            <input type="email" name="email" class="form-control" value="<%= form.email || '' %>" required />
-          </div>
-          <div class="col-12">
-            <label class="form-label">Password <span style="color:var(--text-subtle)">(min 8 characters)</span></label>
-            <input type="password" name="password" class="form-control" required />
-          </div>
-        </div>
-        <button class="btn btn-primary w-100 mt-4" type="submit" style="padding:11px">Create account</button>
-      </form>
-      <p style="text-align:center;margin-top:1.25rem;margin-bottom:0;font-size:0.85rem;color:var(--text-muted)">
-        Already have an account? <a href="/login" style="color:var(--accent);text-decoration:none">Log in</a>
-      </p>
+<div class="auth-wrap">
+  <div class="auth-card" style="max-width:520px">
+    <div style="text-align:center;margin-bottom:28px">
+      <div style="font-size:28px;margin-bottom:10px">🦈</div>
+      <h1 style="font-size:22px;font-weight:700;color:var(--text);margin-bottom:6px">Create your account</h1>
+      <p style="font-size:14px;color:var(--text-3)">Join the Charlottesville parking community</p>
     </div>
+
+    <% if (errors && errors.length) { %>
+      <div class="alert alert-danger mb-4" style="font-size:13.5px">
+        <ul style="margin:0;padding-left:18px">
+          <% errors.forEach((e) => { %><li><%= e.msg %><% if (e.path) { %> (<%= e.path %>)<% } %></li><% }) %>
+        </ul>
+      </div>
+    <% } %>
+
+    <form method="post" action="/register">
+      <div class="row g-3 mb-3">
+        <div class="col-6">
+          <label class="form-label">First name</label>
+          <input name="first_name" class="form-control" value="<%= form.first_name || '' %>" required />
+        </div>
+        <div class="col-6">
+          <label class="form-label">Last name</label>
+          <input name="last_name" class="form-control" value="<%= form.last_name || '' %>" required />
+        </div>
+      </div>
+      <div class="row g-3 mb-3">
+        <div class="col-6">
+          <label class="form-label">Computing ID</label>
+          <input name="computing_id" class="form-control" value="<%= form.computing_id || '' %>" required placeholder="abc1xy" />
+        </div>
+        <div class="col-6">
+          <label class="form-label">Phone <span style="color:var(--text-4);text-transform:none;letter-spacing:0;font-weight:400">(optional)</span></label>
+          <input name="phone_number" class="form-control" value="<%= form.phone_number || '' %>" placeholder="434-555-0100" />
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Email address</label>
+        <input type="email" name="email" class="form-control" value="<%= form.email || '' %>" required placeholder="you@virginia.edu" />
+      </div>
+      <div class="mb-4">
+        <label class="form-label">Password <span style="color:var(--text-4);text-transform:none;letter-spacing:0;font-weight:400">(min 8 characters)</span></label>
+        <input type="password" name="password" class="form-control" required />
+      </div>
+      <button class="btn btn-primary w-100" type="submit"
+              style="border-radius:var(--radius);padding:13px;font-size:15px">
+        Create account
+      </button>
+    </form>
+
+    <p style="text-align:center;font-size:14px;color:var(--text-3);margin-top:20px;margin-bottom:0">
+      Already have an account?&nbsp;
+      <a href="/login" style="color:var(--text);font-weight:700;text-decoration:underline">Log in</a>
+    </p>
   </div>
 </div>

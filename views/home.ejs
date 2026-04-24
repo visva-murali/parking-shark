@@ -1,29 +1,65 @@
 <div class="ps-hero">
-  <p class="ps-hero-eyebrow">Charlottesville · UVA</p>
-  <h1 class="ps-hero-title">
-    Park smarter.<br>
-    <span class="line-orange">Earn more.</span>
-  </h1>
-  <p class="ps-hero-sub">
-    The peer-to-peer driveway marketplace for Charlottesville.
-    List your spot. Book by the hour. No predatory towing.
-  </p>
-  <div class="ps-hero-actions">
-    <a href="/spots" class="btn btn-primary btn-lg">Find a spot</a>
-    <a href="/register" class="btn btn-outline-secondary btn-lg">List your driveway</a>
+  <div class="container" style="max-width:720px">
+    <p class="ps-hero-eyebrow">Charlottesville · JPA · The Corner · Rugby Rd</p>
+    <h1 class="ps-hero-title">Parking, sorted.<br>By the hour.</h1>
+    <p class="ps-hero-sub">
+      Rent a neighbor's driveway. List your own. No apps to download,
+      no meters to feed, no towing surprises.
+    </p>
+
+    <!-- Search bar -->
+    <form action="/spots" method="get">
+      <div class="ps-search-bar" style="max-width:640px;margin:0 auto">
+        <div class="ps-search-field">
+          <label for="hero-q">Where</label>
+          <input id="hero-q" name="q" type="text" placeholder="Street, zip, or area" />
+        </div>
+        <div class="ps-search-field" style="max-width:180px">
+          <label for="hero-type">Spot type</label>
+          <select id="hero-type" name="type_id">
+            <option value="">Any type</option>
+            <option value="1">Driveway</option>
+            <option value="2">Garage</option>
+            <option value="3">Lawn</option>
+            <option value="4">Street-side</option>
+            <option value="5">Lot</option>
+          </select>
+        </div>
+        <div class="ps-search-btn">
+          <button type="submit" aria-label="Search">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <div class="ps-hero-stats">
+      <div>
+        <span class="ps-stat-value">15+</span>
+        <div class="ps-stat-label">Spots listed</div>
+      </div>
+      <div>
+        <span class="ps-stat-value">$4–10</span>
+        <div class="ps-stat-label">Per hour</div>
+      </div>
+      <div>
+        <span class="ps-stat-value">10 min</span>
+        <div class="ps-stat-label">From Grounds</div>
+      </div>
+    </div>
   </div>
-  <div class="ps-hero-stats">
-    <div class="text-center">
-      <span class="ps-stat-value">15+</span>
-      <div class="ps-stat-label">Spots nearby</div>
-    </div>
-    <div class="text-center">
-      <span class="ps-stat-value">$4–10</span>
-      <div class="ps-stat-label">Per hour</div>
-    </div>
-    <div class="text-center">
-      <span class="ps-stat-value">JPA</span>
-      <div class="ps-stat-label">+ Corner + Rugby</div>
-    </div>
+</div>
+
+<!-- Category chips -->
+<div class="container py-4">
+  <div class="ps-type-chips">
+    <a href="/spots" class="ps-chip active">All spots</a>
+    <a href="/spots?type_id=1" class="ps-chip">🏠 Driveway</a>
+    <a href="/spots?type_id=2" class="ps-chip">🅿️ Garage</a>
+    <a href="/spots?type_id=3" class="ps-chip">🌿 Lawn</a>
+    <a href="/spots?type_id=4" class="ps-chip">🛣️ Street-side</a>
+    <a href="/spots?type_id=5" class="ps-chip">📦 Lot</a>
   </div>
 </div>

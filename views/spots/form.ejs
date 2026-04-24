@@ -1,21 +1,18 @@
 <div class="row justify-content-center">
-  <div class="col-lg-8">
-    <!-- Header -->
-    <div class="mb-4">
-      <h1 style="font-family:'Barlow Condensed';font-size:2.4rem;font-weight:800;margin-bottom:4px">
-        <%= spot ? 'Edit listing' : 'List your driveway' %>
+  <div class="col-lg-7">
+    <div style="margin-bottom:28px">
+      <h1 style="font-size:26px;font-weight:700;color:var(--text);letter-spacing:-0.01em;margin-bottom:6px">
+        <%= spot ? 'Edit your listing' : 'List your parking spot' %>
       </h1>
-      <p style="color:var(--text-muted);margin:0">
-        <%= spot ? 'Update your spot details below.' : 'Turn your driveway into income. Takes 2 minutes.' %>
+      <p style="font-size:14px;color:var(--text-3)">
+        <%= spot ? 'Update the details below.' : 'Takes about 2 minutes. Start earning today.' %>
       </p>
     </div>
 
     <% if (errors && errors.length) { %>
       <div class="alert alert-danger mb-4">
-        <ul class="mb-0 ps-3">
-          <% errors.forEach((e) => { %>
-            <li><%= e.msg %><% if (e.path) { %> <span style="opacity:0.7">(<%= e.path %>)</span><% } %></li>
-          <% }) %>
+        <ul style="margin:0;padding-left:18px;font-size:13.5px">
+          <% errors.forEach((e) => { %><li><%= e.msg %></li><% }) %>
         </ul>
       </div>
     <% } %>
@@ -23,10 +20,9 @@
     <form method="post" action="<%= spot ? '/spots/' + spot.spot_id + '/edit' : '/spots' %>">
 
       <% if (!spot) { %>
-        <!-- ── Address section ── -->
         <div class="card mb-4">
           <div class="card-body">
-            <p style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:14px">Location</p>
+            <h2 style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:16px">Location</h2>
             <div class="row g-3">
               <div class="col-12">
                 <label class="form-label">Street address</label>
@@ -49,10 +45,9 @@
         </div>
       <% } %>
 
-      <!-- ── Spot details section ── -->
       <div class="card mb-4">
         <div class="card-body">
-          <p style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:14px">Spot details</p>
+          <h2 style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:16px">Spot details</h2>
           <div class="row g-3">
             <div class="col-md-6">
               <label class="form-label">Spot type</label>
@@ -65,36 +60,37 @@
               </select>
             </div>
             <div class="col-md-6">
-              <label class="form-label">Hourly rate ($)</label>
-              <input type="number" step="0.01" min="0.01" name="hourly_rate" class="form-control"
-                     value="<%= form.hourly_rate || '5.00' %>" required />
+              <label class="form-label">Hourly rate (USD)</label>
+              <div style="position:relative">
+                <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-3);font-size:14px">$</span>
+                <input type="number" step="0.01" min="0.01" name="hourly_rate" class="form-control"
+                       value="<%= form.hourly_rate || '5.00' %>" required style="padding-left:26px" />
+              </div>
             </div>
             <div class="col-12">
               <label class="form-label">
                 Instructions
-                <span style="color:var(--text-subtle);font-size:0.75rem;text-transform:none;letter-spacing:0">(optional)</span>
+                <span style="color:var(--text-4);text-transform:none;letter-spacing:0;font-weight:400;font-size:11px"> — visible to renters after booking</span>
               </label>
               <textarea name="instructions" class="form-control" rows="3"
-                        placeholder="e.g. Pull into driveway on left. Do not block garage."><%= form.instructions || '' %></textarea>
+                        placeholder="e.g. 'Pull into the left driveway, do not block the garage.'"><%= form.instructions || '' %></textarea>
             </div>
             <% if (!spot) { %>
               <div class="col-12">
                 <label class="form-label">
-                  Photo URL
-                  <span style="color:var(--text-subtle);font-size:0.75rem;text-transform:none;letter-spacing:0">(optional, can add more later)</span>
+                  Cover photo URL
+                  <span style="color:var(--text-4);text-transform:none;letter-spacing:0;font-weight:400;font-size:11px"> — optional</span>
                 </label>
                 <input name="photo_url" class="form-control" value="<%= form.photo_url || '' %>" placeholder="https://…" />
               </div>
             <% } %>
             <% if (spot) { %>
               <div class="col-12">
-                <div class="form-check">
-                  <input type="checkbox" name="is_active" class="form-check-input" id="isActive"
+                <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+                  <input type="checkbox" name="is_active" class="form-check-input" style="margin:0;width:18px;height:18px"
                     <%= (form.is_active === 'on' || form.is_active === true || form.is_active == 1) ? 'checked' : '' %> />
-                  <label for="isActive" class="form-check-label" style="font-size:0.875rem;color:var(--text);text-transform:none;letter-spacing:0;font-weight:400">
-                    Active — visible to renters
-                  </label>
-                </div>
+                  <span style="font-size:14px;color:var(--text-2)">Active — visible to renters</span>
+                </label>
               </div>
             <% } %>
           </div>
@@ -102,12 +98,10 @@
       </div>
 
       <div class="d-flex gap-2">
-        <button class="btn btn-primary" type="submit" style="padding:10px 28px">
-          <%= spot ? 'Save changes' : 'List it' %>
+        <button class="btn btn-primary" type="submit" style="border-radius:var(--radius);padding:12px 28px">
+          <%= spot ? 'Save changes' : 'List your spot' %>
         </button>
-        <a href="<%= spot ? '/spots/' + spot.spot_id : '/spots' %>" class="btn btn-outline-secondary">
-          Cancel
-        </a>
+        <a href="<%= spot ? '/spots/' + spot.spot_id : '/spots' %>" class="btn btn-ghost">Cancel</a>
       </div>
     </form>
   </div>

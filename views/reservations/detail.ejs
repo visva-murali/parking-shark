@@ -1,72 +1,60 @@
-<div class="row g-4">
-
-  <!-- ── Left: reservation details ── -->
+<div class="row g-5">
+  <!-- LEFT -->
   <div class="col-lg-8">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-start mb-4">
-      <div>
-        <p style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:4px">
-          Reservation #<%= r.reservation_id %>
-        </p>
-        <h1 style="font-family:'Barlow Condensed';font-size:2.2rem;font-weight:800;margin:0;line-height:1">
-          <%= r.street %>
-        </h1>
-        <p style="color:var(--text-muted);margin:4px 0 0;font-size:0.9rem">
-          <%= r.city %>, <%= r.state %> &middot; <%= r.type_name %>
-        </p>
+    <div style="margin-bottom:24px">
+      <a href="/spots/<%= r.spot_id %>" style="font-size:13px;color:var(--text-3);text-decoration:none;display:inline-flex;align-items:center;gap:4px;margin-bottom:12px">
+        ← Back to listing
+      </a>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+        <div>
+          <h1 style="font-size:24px;font-weight:700;color:var(--text);letter-spacing:-0.01em;margin-bottom:4px"><%= r.street %></h1>
+          <p style="font-size:14px;color:var(--text-3)"><%= r.city %>, <%= r.state %> · <%= r.type_name %></p>
+        </div>
+        <span class="badge bg-<%= {Pending:'warning',Confirmed:'primary',Completed:'success',Cancelled:'secondary'}[r.status_name] %>" style="white-space:nowrap;margin-top:4px">
+          <%= r.status_name %>
+        </span>
       </div>
-      <span class="badge bg-<%= {Pending:'warning',Confirmed:'primary',Completed:'success',Cancelled:'secondary'}[r.status_name] || 'secondary' %>"
-            style="font-size:0.75rem;padding:6px 12px;align-self:flex-start">
-        <%= r.status_name %>
-      </span>
     </div>
 
-    <!-- Cost band -->
-    <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.2rem 1.5rem;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center">
+    <!-- Cost -->
+    <div style="background:var(--off-white);border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center">
       <div>
-        <p style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin:0 0 2px">Total</p>
-        <span style="font-family:'Barlow Condensed';font-size:2.4rem;font-weight:800;color:var(--accent);line-height:1">
-          $<%= Number(r.total_cost).toFixed(2) %>
-        </span>
+        <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:4px">Total cost</p>
+        <span style="font-size:30px;font-weight:800;color:var(--text);letter-spacing:-0.02em">$<%= Number(r.total_cost).toFixed(2) %></span>
       </div>
       <div style="text-align:right">
-        <p style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin:0 0 2px">Rate at booking</p>
-        <span style="font-family:'Barlow Condensed';font-size:1.3rem;font-weight:600;color:var(--text)">
-          $<%= Number(r.hourly_rate_at_booking).toFixed(2) %><span style="font-family:'DM Sans';font-size:0.8rem;color:var(--text-muted)">/hr</span>
-        </span>
+        <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:4px">Rate</p>
+        <span style="font-size:16px;font-weight:600;color:var(--text-2)">$<%= Number(r.hourly_rate_at_booking).toFixed(2) %>/hr</span>
       </div>
     </div>
 
-    <!-- Info cards row -->
-    <div class="row g-3 mb-3">
-      <!-- When -->
+    <!-- Info grid -->
+    <div class="row g-3 mb-4">
       <div class="col-md-6">
-        <div class="card h-100">
+        <div class="card">
           <div class="card-body">
-            <p style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:10px">When</p>
-            <div style="display:flex;flex-direction:column;gap:6px;font-size:0.875rem">
-              <div class="d-flex justify-content-between">
-                <span style="color:var(--text-muted)">Start</span>
+            <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:12px">Dates & times</p>
+            <div style="display:flex;flex-direction:column;gap:8px;font-size:14px">
+              <div style="display:flex;justify-content:space-between">
+                <span style="color:var(--text-3)">Start</span>
                 <span style="color:var(--text);font-weight:500"><%= new Date(r.start_time).toLocaleString() %></span>
               </div>
-              <div class="d-flex justify-content-between">
-                <span style="color:var(--text-muted)">End</span>
+              <div style="border-top:1px solid var(--border-light);padding-top:8px;display:flex;justify-content:space-between">
+                <span style="color:var(--text-3)">End</span>
                 <span style="color:var(--text);font-weight:500"><%= new Date(r.end_time).toLocaleString() %></span>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <!-- Vehicle -->
       <div class="col-md-6">
-        <div class="card h-100">
+        <div class="card">
           <div class="card-body">
-            <p style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:10px">Vehicle</p>
-            <p style="font-weight:600;color:var(--text);margin-bottom:3px">
-              <%= r.year || '' %> <%= r.make %> <%= r.model %>
-            </p>
-            <p style="font-size:0.8rem;color:var(--text-muted);margin:0">
-              <%= r.color || '' %><% if (r.license_plate) { %> &middot; <%= r.license_plate %> (<%= r.plate_state %>)<% } %>
+            <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:12px">Vehicle</p>
+            <p style="font-weight:600;color:var(--text);font-size:15px;margin-bottom:3px"><%= r.year || '' %> <%= r.make %> <%= r.model %></p>
+            <p style="font-size:13px;color:var(--text-3);margin:0">
+              <%= r.color || '' %>
+              <% if (r.license_plate) { %> · <%= r.license_plate %> (<%= r.plate_state %>)<% } %>
             </p>
           </div>
         </div>
@@ -75,35 +63,29 @@
 
     <!-- Payment -->
     <% if (r.payment_id) { %>
-      <div class="card mb-3">
+      <div class="card mb-4">
         <div class="card-body">
-          <p style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:10px">Payment</p>
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <span style="font-size:0.9rem;color:var(--text)">$<%= Number(r.amount).toFixed(2) %></span>
-              <span style="color:var(--text-muted);margin:0 8px">&middot;</span>
-              <span style="font-size:0.85rem;color:var(--text-muted)"><%= r.method || '—' %></span>
-            </div>
-            <span class="badge bg-<%= r.payment_status==='Paid' ? 'success' : r.payment_status==='Refunded' ? 'secondary' : 'warning' %>">
+          <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:12px">Payment</p>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:14px">
+            <span style="color:var(--text-2)">$<%= Number(r.amount).toFixed(2) %> via <%= r.method || '—' %></span>
+            <span class="badge bg-<%= r.payment_status==='Paid'?'success':r.payment_status==='Refunded'?'secondary':'warning' %>">
               <%= r.payment_status %>
             </span>
           </div>
           <% if (r.paid_at) { %>
-            <p style="font-size:0.75rem;color:var(--text-muted);margin-top:6px;margin-bottom:0">
-              Paid <%= new Date(r.paid_at).toLocaleString() %>
-            </p>
+            <p style="font-size:12px;color:var(--text-3);margin-top:6px;margin-bottom:0">Paid <%= new Date(r.paid_at).toLocaleString() %></p>
           <% } %>
         </div>
       </div>
     <% } %>
 
-    <!-- Review section (renter, completed only) -->
+    <!-- Review (renter, completed) -->
     <% if (roles.isRenter && r.status_name === 'Completed') { %>
       <div class="card">
         <div class="card-body">
-          <p style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:14px">
+          <h3 style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:16px">
             <%= review ? 'Your review' : 'Leave a review' %>
-          </p>
+          </h3>
           <form method="post" action="/reservations/<%= r.reservation_id %>/review">
             <div class="row g-3">
               <div class="col-md-4">
@@ -121,11 +103,11 @@
                 <textarea name="comment" class="form-control" rows="2" placeholder="How was the spot?"><%= review ? review.comment || '' : '' %></textarea>
               </div>
             </div>
-            <div class="d-flex gap-2 mt-3">
-              <button class="btn btn-primary btn-sm"><%= review ? 'Update review' : 'Post review' %></button>
+            <div style="margin-top:14px;display:flex;gap:10px;align-items:center">
+              <button class="btn btn-primary btn-sm"><%= review ? 'Update' : 'Post review' %></button>
               <% if (review) { %>
                 <form method="post" action="/reservations/<%= r.reservation_id %>/review/delete" class="d-inline">
-                  <button class="btn btn-outline-danger btn-sm">Delete</button>
+                  <button class="btn btn-ghost btn-sm" style="color:var(--text-3);font-size:13px">Delete review</button>
                 </form>
               <% } %>
             </div>
@@ -135,13 +117,13 @@
     <% } %>
   </div>
 
-  <!-- ── Right: actions ── -->
+  <!-- RIGHT: actions -->
   <div class="col-lg-4">
-    <div class="card sticky-top">
+    <div class="card" style="position:sticky;top:calc(var(--nav-h) + 16px)">
       <div class="card-body">
-        <p style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:14px">Actions</p>
-
+        <h3 style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:16px">Manage reservation</h3>
         <div style="display:flex;flex-direction:column;gap:10px">
+
           <% if (roles.isHost && r.status_name === 'Pending') { %>
             <form method="post" action="/reservations/<%= r.reservation_id %>/status">
               <input type="hidden" name="action" value="confirm" />
@@ -157,42 +139,37 @@
           <% if (['Pending','Confirmed'].includes(r.status_name)) { %>
             <form method="post" action="/reservations/<%= r.reservation_id %>/status">
               <input type="hidden" name="action" value="cancel" />
-              <button class="btn btn-outline-danger w-100">Cancel reservation</button>
+              <button class="btn btn-outline w-100" style="border-color:var(--danger-c);color:var(--danger-c)">Cancel reservation</button>
             </form>
           <% } %>
 
           <% if (roles.isRenter && ['Pending','Confirmed'].includes(r.status_name)) { %>
-            <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:2px">
-              <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px">Extend end time</p>
+            <hr style="border-color:var(--border-light);margin:4px 0" />
+            <div>
+              <p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);margin-bottom:8px">Extend end time</p>
               <form method="post" action="/reservations/<%= r.reservation_id %>/extend">
                 <input type="datetime-local" name="end_time" class="form-control mb-2" required />
-                <button class="btn btn-outline-primary w-100 btn-sm">Extend</button>
+                <button class="btn btn-outline w-100 btn-sm">Extend</button>
               </form>
             </div>
           <% } %>
 
           <% if (r.payment_status === 'Pending' && roles.isRenter) { %>
-            <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:2px">
-              <form method="post" action="/reservations/<%= r.reservation_id %>/pay">
-                <button class="btn btn-success w-100">Mark as paid</button>
-              </form>
-            </div>
+            <hr style="border-color:var(--border-light);margin:4px 0" />
+            <form method="post" action="/reservations/<%= r.reservation_id %>/pay">
+              <button class="btn btn-success w-100">Mark as paid</button>
+            </form>
           <% } %>
 
           <% if (r.status_name === 'Cancelled') { %>
-            <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:2px">
-              <form method="post" action="/reservations/<%= r.reservation_id %>/delete"
-                    onsubmit="return confirm('Permanently delete this reservation?')">
-                <button class="btn btn-outline-danger w-100 btn-sm">Delete permanently</button>
-              </form>
-            </div>
+            <hr style="border-color:var(--border-light);margin:4px 0" />
+            <form method="post" action="/reservations/<%= r.reservation_id %>/delete"
+                  onsubmit="return confirm('Permanently delete this reservation?')">
+              <button class="btn btn-outline btn-sm w-100" style="border-color:var(--danger-c);color:var(--danger-c)">
+                Delete permanently
+              </button>
+            </form>
           <% } %>
-        </div>
-
-        <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px">
-          <a href="/spots/<%= r.spot_id %>" style="color:var(--accent);font-size:0.85rem;text-decoration:none">
-            ← View spot listing
-          </a>
         </div>
       </div>
     </div>

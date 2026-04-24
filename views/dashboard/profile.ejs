@@ -1,23 +1,20 @@
-<div class="row">
-  <div class="col-12 mb-4">
-    <h2 style="font-family:'Barlow Condensed';font-size:2.4rem;font-weight:800;margin:0">Account settings</h2>
-    <p style="color:var(--text-muted);margin:4px 0 0;font-size:0.875rem">
-      <%= user.computing_id %> &middot; Member since <%= new Date(user.created_at).toLocaleDateString('en-US',{year:'numeric',month:'long'}) %>
-    </p>
-  </div>
+<div style="margin-bottom:28px">
+  <h1 style="font-size:26px;font-weight:700;color:var(--text);margin-bottom:4px">Account</h1>
+  <p style="font-size:14px;color:var(--text-3)">
+    <%= user.computing_id %> &nbsp;·&nbsp; Member since <%= new Date(user.created_at).toLocaleDateString('en-US',{month:'long',year:'numeric'}) %>
+  </p>
 </div>
 
 <div class="row g-4">
-  <!-- Profile form -->
   <div class="col-md-6">
-    <div class="card h-100">
+    <div class="card">
       <div class="card-body">
-        <p style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:16px">Profile</p>
+        <h2 style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:20px">Personal info</h2>
         <form method="post" action="/profile">
           <div class="mb-3">
             <label class="form-label">Computing ID</label>
             <input class="form-control" value="<%= user.computing_id %>" disabled
-                   style="opacity:0.45;cursor:not-allowed" />
+                   style="background:var(--off-white);color:var(--text-3);cursor:not-allowed" />
           </div>
           <div class="row g-3 mb-3">
             <div class="col-6">
@@ -30,31 +27,30 @@
             </div>
           </div>
           <div class="mb-4">
-            <label class="form-label">Email</label>
+            <label class="form-label">Email address</label>
             <input type="email" name="email" class="form-control" value="<%= user.email %>" required />
           </div>
-          <button class="btn btn-primary">Save changes</button>
+          <button class="btn btn-primary btn-sm">Save changes</button>
         </form>
       </div>
     </div>
   </div>
 
-  <!-- Phone numbers -->
   <div class="col-md-6">
-    <div class="card h-100">
+    <div class="card">
       <div class="card-body">
-        <p style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:16px">Phone numbers</p>
+        <h2 style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:20px">Phone numbers</h2>
 
         <% if (!phones.length) { %>
-          <p style="font-size:0.875rem;color:var(--text-muted);margin-bottom:16px">No phone numbers on file.</p>
+          <p style="font-size:13.5px;color:var(--text-3);margin-bottom:16px">No phone numbers on file.</p>
         <% } else { %>
-          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+          <div style="display:flex;flex-direction:column;gap:1px;border:1px solid var(--border-light);border-radius:var(--radius);overflow:hidden;background:var(--border-light);margin-bottom:16px">
             <% phones.forEach((p) => { %>
-              <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px">
-                <span style="font-family:'Barlow Condensed';font-size:1.1rem;font-weight:600"><%= p.phone_number %></span>
-                <form method="post" action="/profile/phones/delete" class="d-inline">
+              <div style="background:var(--white);padding:10px 14px;display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:14px;font-weight:500;color:var(--text)"><%= p.phone_number %></span>
+                <form method="post" action="/profile/phones/delete">
                   <input type="hidden" name="phone_number" value="<%= p.phone_number %>" />
-                  <button class="btn btn-outline-danger btn-sm" style="font-size:0.75rem;padding:3px 8px">Remove</button>
+                  <button class="btn btn-ghost btn-sm" style="font-size:12px;color:var(--text-3);text-decoration:none">Remove</button>
                 </form>
               </div>
             <% }) %>
@@ -65,7 +61,7 @@
           <label class="form-label">Add phone number</label>
           <div class="d-flex gap-2">
             <input name="phone_number" class="form-control" placeholder="434-555-0100" required />
-            <button class="btn btn-primary" style="white-space:nowrap">Add</button>
+            <button class="btn btn-outline btn-sm" style="white-space:nowrap">Add</button>
           </div>
         </form>
       </div>
