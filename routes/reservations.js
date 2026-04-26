@@ -16,12 +16,48 @@ const router = express.Router();
 // and raises SIGNAL if an overlap exists.
 router.post('/', requireLogin, async (req, res, next) => {
   const { spot_id, vehicle_id, start_time, end_time, payment_method } = req.body;
+  const spotId = parseInt(spot_id, 10);
+  const vehicleId = parseInt(vehicle_id, 10);
+
+  if (
+    !Number.isInteger(spotId) ||
+    !Number.isInteger(vehicleId) ||
+    !start_time ||
+    !end_time ||
+    new Date(end_time) <= new Date(start_time)
+  ) {
+    req.session.flash = { type: 'danger', msg: 'Choose a valid vehicle and time range.' };
+    return res.redirect(spot_id ? `/spots/${spot_id}` : '/spots');
+  }
+
   const conn = await pool.getConnection();
   try {
+    const [[spot]] = await conn.query(
+      'SELECT host_user_id, is_active FROM spots WHERE spot_id = ?',
+      [spotId],
+    );
+    if (!spot || !spot.is_active) {
+      req.session.flash = { type: 'danger', msg: 'That spot is not available.' };
+      return res.redirect('/spots');
+    }
+    if (spot.host_user_id === req.session.user.user_id) {
+      req.session.flash = { type: 'warning', msg: 'You cannot book your own listing.' };
+      return res.redirect(`/spots/${spotId}`);
+    }
+
+    const [[vehicle]] = await conn.query(
+      'SELECT vehicle_id FROM vehicles WHERE vehicle_id = ? AND user_id = ?',
+      [vehicleId, req.session.user.user_id],
+    );
+    if (!vehicle) {
+      req.session.flash = { type: 'danger', msg: 'Choose one of your own vehicles.' };
+      return res.redirect(`/spots/${spotId}`);
+    }
+
     await conn.query('CALL create_booking(?, ?, ?, ?, ?, ?, @new_id)', [
-      parseInt(spot_id, 10),
+      spotId,
       req.session.user.user_id,
-      parseInt(vehicle_id, 10),
+      vehicleId,
       start_time,
       end_time,
       payment_method || 'Credit Card',
@@ -33,7 +69,7 @@ router.post('/', requireLogin, async (req, res, next) => {
     // Stored procedure raises SIGNAL SQLSTATE '45000' on conflict or bad input.
     if (err.sqlState === '45000') {
       req.session.flash = { type: 'danger', msg: err.sqlMessage };
-      return res.redirect(`/spots/${spot_id}`);
+      return res.redirect(`/spots/${spotId}`);
     }
     next(err);
   } finally {
