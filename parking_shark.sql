@@ -348,6 +348,11 @@ INSERT INTO reviews (reservation_id, rating, comment, created_at) VALUES
 -- =============================================================
 -- SECTION 4: NON-ADVANCED SQL COMMANDS — RETRIEVE (SELECT)
 -- =============================================================
+/*
+The statements in Sections 4-6 are the milestone/report SQL examples.
+They are intentionally commented out so a fresh setup can run this file
+without mutating or deleting seed data. The Express app implements these
+same retrieve/update/delete patterns in routes/.
 
 -- 4.1 Get all active spots with address and type (for browse/search page)
 SELECT s.spot_id, s.hourly_rate, s.instructions, s.is_active,
@@ -649,6 +654,7 @@ WHERE reservation_id = 9
 -- =============================================================
 -- SECTION 7: ADVANCED SQL COMMANDS
 -- =============================================================
+*/
 
 -- ---------------------------------------------------------------
 -- ADVANCED SQL #1: TRIGGER
