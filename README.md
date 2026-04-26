@@ -16,7 +16,7 @@ Peer-to-peer driveway parking marketplace for Charlottesville / UVA.
 
 - **Frontend:** EJS templates + Bootstrap 5 (CDN)
 - **Backend:** Node.js 20 + Express 4
-- **Database:** MySQL 8 (local for dev, Google Cloud SQL for production)
+- **Database:** MySQL 8
 - **Driver:** `mysql2/promise` (parameterized queries only)
 - **Auth:** `bcrypt` (cost 12) + `express-session` + session store in MySQL via `express-mysql-session`
 
@@ -40,7 +40,6 @@ sql/
   schema.sql              Tables + stored proc + trigger + check constraints (Milestone 2)
   migration_auth.sql      Adds password_hash + role columns
   grants.sql              GRANT/REVOKE for ps_app and ps_dev
-deploy/app.yaml           GCP App Engine config
 ```
 
 ---
@@ -102,71 +101,6 @@ The seed data in `sql/schema.sql` + `sql/migration_auth.sql` creates 10 users, a
 
 ---
 
-## Deployment — Google Cloud Platform (+10 extra credit)
-
-### 1. Create a GCP project and enable APIs
-
-```bash
-gcloud projects create parking-shark-XXXXX
-gcloud config set project parking-shark-XXXXX
-gcloud services enable sqladmin.googleapis.com appengine.googleapis.com
-```
-
-### 2. Create Cloud SQL MySQL instance
-
-```bash
-gcloud sql instances create ps-mysql \
-  --database-version=MYSQL_8_0 \
-  --tier=db-f1-micro \
-  --region=us-central1 \
-  --root-password="CHANGE_ME"
-
-gcloud sql databases create parking_shark --instance=ps-mysql
-```
-
-Note the **connection name**: `PROJECT_ID:us-central1:ps-mysql`
-
-### 3. Apply schema
-
-Open a Cloud SQL Auth Proxy locally:
-
-```bash
-./cloud-sql-proxy PROJECT_ID:us-central1:ps-mysql --port 3307 &
-
-mysql -u root -p -h 127.0.0.1 -P 3307 < sql/schema.sql
-mysql -u root -p -h 127.0.0.1 -P 3307 < sql/migration_auth.sql
-mysql -u root -p -h 127.0.0.1 -P 3307 < sql/grants.sql
-```
-
-### 4. Create App Engine app
-
-```bash
-gcloud app create --region=us-central
-```
-
-### 5. Configure `deploy/app.yaml`
-
-Replace `REPLACE_PROJECT:REGION:ps-mysql` in `deploy/app.yaml` with your actual connection name in both places.
-
-### 6. Deploy
-
-```bash
-gcloud app deploy deploy/app.yaml \
-  --set-env-vars "DB_PASS=YOUR_PS_APP_PASSWORD,SESSION_SECRET=$(node -e 'console.log(require(\"crypto\").randomBytes(32).toString(\"hex\"))')"
-
-gcloud app browse
-```
-
-### 7. Screenshot for report
-
-In the GCP Console, screenshot:
-- **SQL → Instances → ps-mysql overview** (shows database hosted on GCP)
-- **App Engine → Services** (shows app hosted on GCP)
-
-Include the live URL from `gcloud app browse` in your report.
-
----
-
 ## How this meets the rubric
 
 | Requirement (points) | Implementation |
@@ -179,7 +113,7 @@ Include the live URL from `gcloud app browse` in your report.
 | 15 update | §5.1–5.10 wired in `routes/spots.js`, `routes/reservations.js`, `routes/vehicles.js`, `routes/profile.js` |
 | 15 delete | §6.1–6.7 wired in same |
 | 25 extra feature | Search + filter + sort on `/spots`; CSV export for renter and host |
-| 15 multi-user | Cloud SQL + shared pool + session store in MySQL |
+| 15 multi-user | Shared MySQL pool + session store in MySQL |
 | 15 returning user | Sessions; all dashboards filtered by `req.session.user.user_id` |
 | 10 DB-level security | `sql/grants.sql` — `ps_app` with DML only, `ps_dev` for developers |
 | 10 app-level security | bcrypt, sessions, middleware guards, parameterized queries |
