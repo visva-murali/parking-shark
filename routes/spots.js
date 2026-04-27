@@ -80,11 +80,13 @@ router.get('/', async (req, res, next) => {
 
     const [spots] = await pool.query(sql, params);
     const [types] = await pool.query('SELECT spot_type_id, type_name FROM spot_types ORDER BY type_name');
+    const [[{ globalMax }]] = await pool.query('SELECT COALESCE(MAX(hourly_rate), 0) AS globalMax FROM spots WHERE is_active = TRUE');
 
     res.render('spots/browse', {
       title: 'Find a spot',
       spots,
       types,
+      globalMax: parseFloat(globalMax),
       filters: { q, type_id, max_price, start, end, sort },
     });
   } catch (e) {

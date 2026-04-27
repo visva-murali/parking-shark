@@ -72,11 +72,10 @@
   <%
     const _prices = spots.map(s => parseFloat(s.hourly_rate));
     const _pMin = Math.min(..._prices);
-    const _pMax = Math.max(..._prices);
   %>
   <div id="price-filter-bar"
        data-min="<%= _pMin.toFixed(2) %>"
-       data-max="<%= _pMax.toFixed(2) %>"
+       data-max="<%= globalMax.toFixed(2) %>"
        data-active="<%= filters.max_price || '' %>"
        style="margin-bottom:24px;padding:16px 20px;background:var(--off-white);border-radius:var(--radius);border:1px solid var(--border-light)">
     <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px">

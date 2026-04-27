@@ -53,22 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
       countEl.textContent = visible < cards.length ? `${visible} of ${cards.length} shown` : '';
     };
 
-    // Live visual feedback while dragging
     priceSlider.addEventListener('input', applyFilter);
-
-    // On release: navigate with max_price baked into the URL so all other
-    // filters (type, sort, dates, search) are preserved server-side
-    priceSlider.addEventListener('change', () => {
-      const val = parseFloat(priceSlider.value);
-      const params = new URLSearchParams(window.location.search);
-      if (val >= dataMax) {
-        params.delete('max_price');
-      } else {
-        params.set('max_price', val.toFixed(2));
-      }
-      window.location.href = '/spots?' + params.toString();
-    });
-
     applyFilter();
   }
 
