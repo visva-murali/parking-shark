@@ -69,16 +69,27 @@
 
 <!-- Live price filter -->
 <% if (spots.length) { %>
-  <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;padding:12px 16px;background:var(--off-white);border-radius:var(--radius);border:1px solid var(--border-light)">
-    <label style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);white-space:nowrap">
-      Max price
-    </label>
-    <input type="range" id="live-price-filter" min="0" max="20" step="0.5" value="20"
-           style="flex:1;accent-color:var(--accent);cursor:pointer" />
-    <span id="live-price-label" style="font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;min-width:72px;text-align:right">
-      Any price
-    </span>
-    <span id="live-spot-count" style="font-size:12px;color:var(--text-3);white-space:nowrap"></span>
+  <%
+    const _prices = spots.map(s => parseFloat(s.hourly_rate));
+    const _pMin = Math.min(..._prices);
+    const _pMax = Math.max(..._prices);
+  %>
+  <div id="price-filter-bar"
+       data-min="<%= _pMin.toFixed(2) %>"
+       data-max="<%= _pMax.toFixed(2) %>"
+       data-active="<%= filters.max_price || '' %>"
+       style="margin-bottom:24px;padding:16px 20px;background:var(--off-white);border-radius:var(--radius);border:1px solid var(--border-light)">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px">
+      <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3)">Max price / hr</span>
+      <span id="live-price-label" style="font-size:17px;font-weight:700;color:var(--text)">Any price</span>
+    </div>
+    <input type="range" id="live-price-filter" step="0.50"
+           style="width:100%;accent-color:var(--accent);cursor:pointer" />
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+      <span style="font-size:12px;color:var(--text-4)">$<%= _pMin.toFixed(2) %></span>
+      <span id="live-spot-count" style="font-size:12px;font-weight:500;color:var(--accent)"></span>
+      <span style="font-size:12px;color:var(--text-4)">$<%= _pMax.toFixed(2) %></span>
+    </div>
   </div>
 <% } %>
 

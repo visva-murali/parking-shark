@@ -30,27 +30,50 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- Browse page: live price-range filter ---
+  const bar = document.getElementById('price-filter-bar');
   const priceSlider = document.getElementById('live-price-filter');
-  if (priceSlider) {
+  if (bar && priceSlider) {
     const label = document.getElementById('live-price-label');
     const countEl = document.getElementById('live-spot-count');
     const cards = document.querySelectorAll('[data-price]');
-    const max = parseFloat(priceSlider.max);
+    const dataMin = parseFloat(bar.dataset.min);
+    const dataMax = parseFloat(bar.dataset.max);
+    const active  = parseFloat(bar.dataset.active) || dataMax;
+
+    priceSlider.min   = dataMin;
+    priceSlider.max   = dataMax;
+    priceSlider.value = Math.min(active, dataMax);
 
     const applyFilter = () => {
       const val = parseFloat(priceSlider.value);
-      label.textContent = val >= max ? 'Any price' : `Up to $${val.toFixed(2)}/hr`;
+      const atMax = val >= dataMax;
+      label.textContent = atMax ? 'Any price' : `$${val.toFixed(2)} / hr`;
       let visible = 0;
       cards.forEach((card) => {
         const price = parseFloat(card.dataset.price);
-        const show = val >= max || price <= val;
+        const show = atMax || price <= val;
         card.style.display = show ? '' : 'none';
         if (show) visible++;
       });
       countEl.textContent = visible < cards.length ? `${visible} of ${cards.length} shown` : '';
     };
 
+    // Live visual feedback while dragging
     priceSlider.addEventListener('input', applyFilter);
+
+    // On release: navigate with max_price baked into the URL so all other
+    // filters (type, sort, dates, search) are preserved server-side
+    priceSlider.addEventListener('change', () => {
+      const val = parseFloat(priceSlider.value);
+      const params = new URLSearchParams(window.location.search);
+      if (val >= dataMax) {
+        params.delete('max_price');
+      } else {
+        params.set('max_price', val.toFixed(2));
+      }
+      window.location.href = '/spots?' + params.toString();
+    });
+
     applyFilter();
   }
 

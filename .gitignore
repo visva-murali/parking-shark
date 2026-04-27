@@ -5,3 +5,18 @@ npm-debug.log*
 .DS_Store
 *.log
 coverage/
+
+# Claude Code settings
+.claude/
+
+# Playwright browser test artifacts
+.playwright-mcp/
+
+# Test screenshots generated at repo root
+/*.png
+
+# GCP deployment (not in use)
+deploy/
+
+# Live database dump — use sql/ schema files instead
+parking_shark.sql
