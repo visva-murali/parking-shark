@@ -1,267 +1,187 @@
 # Parking Shark
 
-CS 4750 — Database Systems · Spring 2026 · Final Project
+CS 4750 Database Systems final project.
 
-Peer-to-peer driveway parking marketplace for Charlottesville / UVA.
+Parking Shark is a small web app for renting driveway/parking spots around UVA. People can make an account, list a spot, add their car, book a spot, and manage reservations.
 
-**Team**
+Team:
 - Adithya Balasubramaniam (rfb3mg)
 - Rohan Singh (psw2uw)
 - Angad Brar (zqq4hx)
 - Visvajit Murali (dpc8jy)
 
----
+Live app for demo:
 
-## Live deployment (GCP)
+https://parkingsharkuva.ue.r.appspot.com
 
-| | |
-|---|---|
-| **App URL** | https://parkingsharkuva.ue.r.appspot.com |
-| **GCP Project** | `parkingsharkuva` |
-| **Database** | Cloud SQL — MySQL 8.0 — instance `ps-mysql` (us-central1) |
-| **App Engine** | Standard environment — Node.js 20 — region us-east1 |
+## What We Used
 
-> Use the live URL for demos. The database is centrally hosted on GCP so all team members and graders hit the same data.
+- Node / Express
+- EJS templates
+- Bootstrap
+- MySQL
+- bcrypt for passwords
+- express-session with MySQL session storage
 
----
+## Main Files
 
-## Stack
-
-- **Frontend:** EJS templates + Bootstrap 5 (CDN)
-- **Backend:** Node.js 20 + Express 4
-- **Database:** MySQL 8 (Cloud SQL on GCP)
-- **Driver:** `mysql2/promise` (parameterized queries only)
-- **Auth:** `bcrypt` (cost 12) + `express-session` + session store in MySQL via `express-mysql-session`
-
----
-
-## Repo layout
-
-```
-app.js                    Express entry point
-app.yaml                  Google App Engine deployment config
-config/db.js              MySQL connection pool (supports local + Cloud SQL socket)
-middleware/auth.js        requireLogin, requireSpotOwner, requireReservationOwner
-routes/
-  auth.js                 Register, login, logout
-  spots.js                Browse, search, filter, sort, detail, create, edit, delete
-  reservations.js         Book (stored proc), list, extend, cancel, complete, review
-  vehicles.js             Add, verify, delete
-  dashboard.js            Renter + host dashboards
-  profile.js              Profile, phones
-  data.js                 CSV export
-views/                    EJS templates
-public/                   CSS + JS
-sql/
-  schema.sql              Tables + seed data + trigger + stored proc + check constraints
-  migration_auth.sql      Adds password_hash + role columns
-  grants.sql              GRANT/REVOKE for ps_app and ps_dev
-  grants_gcp.sql          GCP-compatible grants (used during initial setup)
-deploy/
-  app.yaml                Original App Engine config template (use root app.yaml to deploy)
+```text
+app.js                  starts the Express app
+config/db.js            database connection
+middleware/auth.js      login and owner checks
+routes/                 app routes
+views/                  EJS pages
+public/                 CSS, JS, favicon files
+sql/schema.sql          tables, seed data, trigger, procedure, constraints
+sql/migration_auth.sql  adds password hashes and roles
+sql/grants.sql          database users/permissions
+deploy/app.yaml         App Engine config template
 ```
 
----
+The original proposal PDF is also in the repo:
 
-## Local development
-
-### 1. Install MySQL 8
-
-```bash
-# macOS
-brew install mysql
-brew services start mysql
+```text
+ParkingShark_-_Database_Systems_Proposal.pdf
 ```
 
-### 2. Install Node dependencies
+## Running It Locally
+
+Install packages:
 
 ```bash
 npm install
 ```
 
-### 3. Create the database
-
-Connect as root and apply in this order:
+Set up MySQL:
 
 ```bash
 mysql -u root -p < sql/schema.sql
 mysql -u root -p < sql/migration_auth.sql
-mysql -u root -p < sql/grants.sql     # edit REPLACE_WITH_STRONG_PW first
 ```
 
-> **Before running `grants.sql`**, replace both occurrences of `REPLACE_WITH_STRONG_PW` with actual passwords.
+For the database user permissions, edit `sql/grants.sql` first and replace `REPLACE_WITH_STRONG_PW`, then run:
 
-### 4. Configure environment
+```bash
+mysql -u root -p < sql/grants.sql
+```
+
+Create a `.env` file:
 
 ```bash
 cp .env.example .env
-# edit .env — set DB_PASS (ps_app password) and a random SESSION_SECRET
-# generate a secret: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-### 5. Run
+Fill in the database password and session secret.
+
+Start the app:
 
 ```bash
-npm run dev      # with nodemon (auto-restart on changes)
-# or
+npm run dev
+```
+
+or:
+
+```bash
 npm start
 ```
 
-Open http://localhost:3000
+Then open:
 
-### Seed accounts
+```text
+http://localhost:3000
+```
 
-All seed users have password `password123`. Log in with any of these:
+## Test Logins
 
-| Email | Name | Role |
-|---|---|---|
-| `ac@virginia.edu` | Alice Chen | admin + host |
-| `bd@virginia.edu` | Brandon Davis | host |
-| `fh@virginia.edu` | Frank Harris | renter |
-| `gi@virginia.edu` | Grace Ingram | renter |
+The seed users use:
 
-See `sql/schema.sql` §3.1 for all 10 seed users.
+```text
+password123
+```
 
----
+Some accounts:
 
-## GCP deployment
+```text
+ac@virginia.edu
+bd@virginia.edu
+fh@virginia.edu
+gi@virginia.edu
+```
 
-### Prerequisites
+## GCP Stuff
 
-- `gcloud` CLI installed and authenticated (`gcloud auth login`)
-- Access to the `parkingsharkuva` GCP project (ask Visvajit to add you — see "Sharing access" below)
+The app is deployed on Google App Engine, and the database is on Cloud SQL.
 
-### Deploy a change
+Current demo setup:
 
-From the project root:
+```text
+GCP project: parkingsharkuva
+Cloud SQL instance: ps-mysql
+Database: parking_shark
+App URL: https://parkingsharkuva.ue.r.appspot.com
+```
+
+To deploy again, use the App Engine config that has the real environment variables. The checked-in `deploy/app.yaml` is just the template version.
 
 ```bash
 gcloud config set project parkingsharkuva
-gcloud app deploy app.yaml --quiet
+gcloud app deploy app.yaml
 ```
 
-That's it. App Engine uploads changed files, builds, and shifts traffic to the new version automatically (~3 min).
+## Features
 
-### View live logs
+Things the app can do:
 
-```bash
-gcloud app logs read --service=default
+- register and log in
+- browse parking spots
+- search/filter/sort spots
+- list a new spot
+- edit/deactivate/delete your own spot
+- add vehicles
+- book a reservation
+- confirm/cancel/complete reservations
+- mark payments paid
+- leave and edit reviews
+- export reservations as CSV
+
+## Database Stuff
+
+We use 13 tables:
+
+```text
+users
+user_phones
+vehicles
+vehicle_registrations
+addresses
+spot_types
+spots
+spot_photos
+availability_windows
+reservation_statuses
+reservations
+payments
+reviews
 ```
 
-### Sharing access with teammates
+The main advanced SQL parts are:
 
-Have Visvajit run (replace with each teammate's Google account email):
+- `prevent_double_booking` trigger, so two people cannot book the same spot at the same time
+- `create_booking` stored procedure, used when someone books a spot
+- check constraints for ratings, prices, payment status, availability type, and reservation times
 
-```bash
-gcloud projects add-iam-policy-binding parkingsharkuva \
-  --member="user:TEAMMATE@gmail.com" \
-  --role="roles/editor"
-```
+The app user in MySQL is `ps_app`. It has limited permissions for the web app. The dev user is `ps_dev`.
 
-Once added, the teammate can see the project at console.cloud.google.com and deploy.
+## Demo Ideas
 
-### Cloud SQL (database)
+A quick demo path:
 
-- **Instance:** `ps-mysql` — `parkingsharkuva:us-central1:ps-mysql`
-- **Public IP:** `34.57.34.113`
-- **App connects via:** Cloud SQL unix socket (configured automatically by App Engine)
-- **App DB user:** `ps_app` (limited DML only — see `sql/grants.sql`)
+1. Log in as one user and browse spots.
+2. Use the search/filter/sort controls.
+3. Add a car if needed.
+4. Book a spot.
+5. Log in as the host and confirm/complete the reservation.
+6. Go back as the renter and leave a review.
+7. Show the CSV export.
 
-To connect locally for debugging (requires your IP to be in the authorized networks list):
-
-```bash
-mysql -u root -p'<root-pw>' -h 34.57.34.113 parking_shark
-```
-
-### Environment variables in production
-
-All secrets live in `app.yaml` (not committed to git — `app.yaml` is in `.gitignore`).
-The key variables are:
-
-| Variable | Purpose |
-|---|---|
-| `CLOUD_SQL_CONNECTION_NAME` | Tells the app to use unix socket instead of TCP |
-| `DB_USER` / `DB_PASS` | App DB credentials |
-| `SESSION_SECRET` | Express session signing key |
-| `NODE_ENV=production` | Enables secure cookies and production error messages |
-
----
-
-## How this meets the rubric
-
-| Requirement | Points | Implementation |
-|---|---|---|
-| 10+ normalized tables used | 10 | 13 tables, all queried in routes |
-| Proposed features | 5 | Spot finder, list driveway, reservations, extend/cancel, date+price filter |
-| Dynamic UI | 5 | (1) Live cost preview on booking form; (2) Live price-range slider on browse (client-side, no reload); (3) Inline status buttons on host dashboard via `fetch` |
-| Retrieve | 15 | 15+ SELECT queries in `routes/spots.js`, `routes/dashboard.js`, `routes/reservations.js`, `routes/profile.js`, `routes/data.js` |
-| Add | 15 | Register user, list spot, add vehicle, `CALL create_booking(...)`, add review, add availability window, add phone |
-| Update | 15 | Edit spot, confirm/complete/cancel reservation, extend reservation, mark payment paid, update profile, verify vehicle, update review |
-| Delete | 15 | Delete spot, delete photo, delete availability window, delete phone, delete vehicle, delete vehicle registration, delete review, delete cancelled reservation |
-| Extra feature (sort + search + export) | 25 | Search by street/zip/city; filter by type, max price, date range; sort price asc/desc/newest; CSV export at `/export/reservations.csv` and `/export/host-bookings.csv` |
-| Multi-user | 15 | MySQL session store (`express-mysql-session`) shared across instances; `prevent_double_booking` trigger prevents concurrent conflicts |
-| Returning user | 15 | Persistent sessions; personalized renter/host dashboards filtered by `req.session.user.user_id` |
-| DB-level security | 10 | `sql/grants.sql` — `ps_app` has DML only + EXECUTE on stored proc; `ps_dev` has full dev access; DDL/DROP/ALTER/TRIGGER explicitly revoked from `ps_app` |
-| App-level security | 10 | bcrypt cost 12; `requireLogin` / `requireSpotOwner` / `requireReservationOwner` middleware; parameterized queries everywhere; `httpOnly` + `secure` session cookies |
-| Advanced SQL | (Milestone 2) | `prevent_double_booking` trigger; `create_booking` stored procedure; 5 CHECK constraints (`chk_rating_range`, `chk_hourly_rate_positive`, `chk_payment_status_values`, `chk_availability_kind_values`, `chk_reservation_time_order`) |
-| **GCP extra credit** | **+10** | Database on Cloud SQL MySQL 8 ✓; App on App Engine Standard ✓ |
-
----
-
-## Advanced SQL in the app
-
-### 1. Trigger — `prevent_double_booking`
-**Where it fires:** `BEFORE INSERT` on `reservations`
-**How the app uses it:** `routes/reservations.js` — the `POST /reservations` route calls the `create_booking` stored procedure which inserts a reservation. If the spot is already booked for the requested window, the trigger raises `SQLSTATE 45000` and the route catches the error, returning a user-friendly flash message.
-
-### 2. Stored procedure — `create_booking`
-**Called from:** `routes/reservations.js` via `CALL create_booking(?, ?, ?, ?, ?, ?, @id)`
-**What it does:** Atomically (1) fetches the current hourly rate, (2) calculates total cost, (3) checks for booking conflicts, (4) inserts the reservation with status Pending, (5) inserts a Pending payment record, (6) returns the new `reservation_id` via OUT parameter — all inside a single transaction.
-
-### 3. CHECK constraints
-Five constraints enforce data integrity at the database level regardless of application-layer validation:
-- `chk_rating_range` — rating must be 1–5
-- `chk_hourly_rate_positive` — hourly_rate > 0
-- `chk_payment_status_values` — payment_status IN ('Pending','Paid','Refunded','Failed')
-- `chk_availability_kind_values` — availability_kind IN ('Available','Blocked')
-- `chk_reservation_time_order` — end_time > start_time
-
----
-
-## Database security
-
-### DB-level (`sql/grants.sql`)
-
-Two MySQL accounts:
-
-**`ps_app`** (used by the Node.js server):
-- SELECT, INSERT, UPDATE, DELETE on all transactional tables
-- SELECT only on lookup tables (`spot_types`, `reservation_statuses`)
-- EXECUTE on `parking_shark.create_booking`
-- SELECT, INSERT, UPDATE, DELETE, CREATE on `parking_shark.sessions` (session store)
-- DDL operations explicitly revoked: DROP, ALTER, CREATE VIEW, CREATE ROUTINE, ALTER ROUTINE, TRIGGER, REFERENCES, GRANT OPTION
-
-**`ps_dev`** (team members):
-- ALL PRIVILEGES on `parking_shark.*`
-
-### App-level (`middleware/auth.js`, `routes/auth.js`)
-
-| Mechanism | Implementation |
-|---|---|
-| Password hashing | `bcrypt.hash(password, 12)` on register; `bcrypt.compare` on login |
-| Session auth | `express-session` + `express-mysql-session`; `req.session.regenerate()` on login to prevent session fixation |
-| Route guards | `requireLogin` — redirects to /login; `requireSpotOwner` — queries DB to confirm session user owns the spot; `requireReservationOwner` — same for reservations |
-| Parameterized queries | All SQL uses `pool.query('... WHERE id = ?', [id])` — no string concatenation |
-| Secure cookies | `httpOnly: true`, `sameSite: 'lax'`, `secure: true` in production |
-| No user enumeration | Login failure returns generic "Invalid credentials" regardless of whether email exists |
-
----
-
-## Development notes
-
-- **Never** use string concatenation in SQL. Always `pool.query('... WHERE x = ?', [val])`.
-- **Never** commit `.env`. Use `.env.example` as the template.
-- **Never** commit `app.yaml` (it contains production secrets). It is in `.gitignore`.
-- When the app user (`ps_app`) gets a permission denied error, that's DB-level security working correctly. Check `sql/grants.sql` and add the minimum privilege needed.
-- The `prevent_double_booking` trigger fires before every reservation INSERT. If you see a booking failure with `SQLSTATE 45000`, the trigger rejected an overlap — this is expected behavior.
-- To redeploy to GCP after any code change: `gcloud app deploy app.yaml --quiet`
+That covers the main CRUD pieces plus the database trigger/procedure.
