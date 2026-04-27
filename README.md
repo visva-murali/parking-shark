@@ -94,7 +94,7 @@ Open http://localhost:3000
 
 The seed data in `sql/schema.sql` + `sql/migration_auth.sql` creates 10 users, all with password `password123`. Log in with any of these emails:
 
-- `ac@virginia.edu` (Alice Chen — admin + host)
+- `alicia.chen@virginia.edu` (Alicia Chen — admin + host)
 - `bd@virginia.edu` (Brandon Davis — host)
 - `fh@virginia.edu` (Frank Harris — renter)
 - … see `sql/schema.sql` §3.1

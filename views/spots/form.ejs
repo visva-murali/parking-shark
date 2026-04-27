@@ -77,11 +77,22 @@
             </div>
             <% if (!spot) { %>
               <div class="col-12">
-                <label class="form-label">
-                  Cover photo URL
-                  <span style="color:var(--text-4);text-transform:none;letter-spacing:0;font-weight:400;font-size:11px"> — optional</span>
-                </label>
-                <input name="photo_url" class="form-control" value="<%= form.photo_url || '' %>" placeholder="https://…" />
+                <label class="form-label">Cover photo URL</label>
+                <input name="photo_url" class="form-control" value="<%= form.photo_url || '' %>" placeholder="https://i.ibb.co/example/photo.jpg" required />
+                <details style="margin-top:10px">
+                  <summary style="cursor:pointer;font-size:13px;font-weight:600;color:var(--accent);user-select:none">How do I get a free image URL? ▸</summary>
+                  <div style="margin-top:10px;padding:14px 16px;background:var(--off-white);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;font-size:13px;color:var(--text-2);line-height:1.7">
+                    <p style="margin:0 0 8px 0;font-weight:600;color:var(--text)">Option 1 — ImgBB (recommended)</p>
+                    <ol style="margin:0 0 12px 0;padding-left:18px">
+                      <li>Go to <a href="https://imgbb.com" target="_blank" rel="noopener noreferrer" style="color:var(--accent)">imgbb.com</a></li>
+                      <li>Click <strong>Choose photo</strong> and select your image</li>
+                      <li>Click <strong>Upload</strong></li>
+                      <li>Under the uploaded image, click <strong>Copy</strong> next to <em>Direct link</em></li>
+                      <li>Paste that URL into the field above</li>
+                    </ol>
+                    <p style="margin:0;color:var(--text-3)">Option 2 — <a href="https://postimages.org" target="_blank" rel="noopener noreferrer" style="color:var(--accent)">Postimages.org</a>: upload → copy the <em>Direct link</em> URL. No account needed on either service.</p>
+                  </div>
+                </details>
               </div>
             <% } %>
             <% if (spot) { %>

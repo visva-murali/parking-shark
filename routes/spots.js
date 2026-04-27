@@ -117,7 +117,7 @@ router.post(
   body('spot_type_id').isInt(),
   body('hourly_rate').isFloat({ min: 0.01 }),
   body('instructions').optional({ checkFalsy: true }).isLength({ max: 2000 }),
-  body('photo_url').optional({ checkFalsy: true }).isLength({ max: 2000 }),
+  body('photo_url').trim().isURL({ require_protocol: true }).withMessage('A valid photo URL is required').isLength({ max: 2000 }),
   async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -149,12 +149,10 @@ router.post(
           req.body.instructions || null,
         ],
       );
-      if (req.body.photo_url) {
-        await conn.query(
-          'INSERT INTO spot_photos (spot_id, photo_url, uploaded_at) VALUES (?, ?, NOW())',
-          [sRes.insertId, req.body.photo_url],
-        );
-      }
+      await conn.query(
+        'INSERT INTO spot_photos (spot_id, photo_url, uploaded_at) VALUES (?, ?, NOW())',
+        [sRes.insertId, req.body.photo_url],
+      );
       await conn.commit();
       req.session.flash = { type: 'success', msg: 'Spot listed!' };
       res.redirect(`/spots/${sRes.insertId}`);
