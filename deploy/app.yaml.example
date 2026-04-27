@@ -1,0 +1,27 @@
+# Google App Engine - Standard environment (Node.js 22)
+# Copy this file to deploy/app.yaml and fill in the real values before deploying.
+# Deploy with: gcloud app deploy deploy/app.yaml
+
+runtime: nodejs22
+env: standard
+instance_class: F1
+
+automatic_scaling:
+  max_instances: 2
+  min_instances: 0
+
+env_variables:
+  NODE_ENV: "production"
+  DB_USER: "YOUR_DB_USER"
+  DB_PASS: "YOUR_DB_PASSWORD"
+  DB_NAME: "parking_shark"
+  SESSION_SECRET: "YOUR_SESSION_SECRET"
+  CLOUD_SQL_CONNECTION_NAME: "YOUR_PROJECT:YOUR_REGION:YOUR_INSTANCE"
+
+beta_settings:
+  cloud_sql_instances: "YOUR_PROJECT:YOUR_REGION:YOUR_INSTANCE"
+
+handlers:
+  - url: /.*
+    script: auto
+    secure: always
