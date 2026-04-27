@@ -70,7 +70,7 @@ router.get('/', async (req, res, next) => {
              u.first_name AS host_first, u.last_name AS host_last,
              (SELECT sp.photo_url FROM spot_photos sp
                WHERE sp.spot_id = s.spot_id
-               ORDER BY sp.uploaded_at ASC LIMIT 1) AS cover_photo
+               ORDER BY sp.uploaded_at DESC LIMIT 1) AS cover_photo
         FROM spots s
         JOIN addresses a   ON s.address_id   = a.address_id
         JOIN spot_types st ON s.spot_type_id = st.spot_type_id
@@ -323,17 +323,28 @@ router.post('/:id/delete', requireLogin, requireSpotOwner('id'), async (req, res
   }
 });
 
-router.post('/:id/photos', requireLogin, requireSpotOwner('id'), async (req, res, next) => {
-  try {
-    await pool.query(
-      'INSERT INTO spot_photos (spot_id, photo_url, uploaded_at) VALUES (?, ?, NOW())',
-      [req.params.id, req.body.photo_url],
-    );
-    res.redirect(`/spots/${req.params.id}`);
-  } catch (e) {
-    next(e);
-  }
-});
+router.post(
+  '/:id/photos',
+  requireLogin,
+  requireSpotOwner('id'),
+  body('photo_url').trim().isURL({ require_protocol: true }).isLength({ max: 2000 }),
+  async (req, res, next) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        req.session.flash = { type: 'danger', msg: 'A valid photo URL is required.' };
+        return res.redirect(`/spots/${req.params.id}`);
+      }
+      await pool.query(
+        'INSERT INTO spot_photos (spot_id, photo_url, uploaded_at) VALUES (?, ?, NOW())',
+        [req.params.id, req.body.photo_url],
+      );
+      res.redirect(`/spots/${req.params.id}`);
+    } catch (e) {
+      next(e);
+    }
+  },
+);
 
 router.post(
   '/:id/photos/:pid/delete',
