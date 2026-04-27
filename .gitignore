@@ -12,8 +12,8 @@ coverage/
 # Playwright browser test artifacts
 .playwright-mcp/
 
-# Test screenshots generated at repo root
-/*.png
+# Test screenshots generated at repo root (keep gcp_proof_*.png)
+/page-*.png
 
 # GCP deployment config (contains production secrets — use deploy/app.yaml as template)
 deploy/

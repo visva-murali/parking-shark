@@ -1,0 +1,2 @@
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE ON parking_shark.* TO 'ps_app'@'%';
+FLUSH PRIVILEGES;
