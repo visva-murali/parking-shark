@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // browse page live price range filter
-  const bar = document.getElementById('price-filter-bar');
   const priceSlider = document.getElementById('live-price-filter');
   if (bar && priceSlider) {
     const label = document.getElementById('live-price-label');
