@@ -58,7 +58,10 @@ router.post(
         role: 'user',
       };
       req.session.flash = { type: 'success', msg: 'Account created. Welcome!' };
-      res.redirect('/spots');
+      req.session.save((saveErr) => {
+        if (saveErr) return next(saveErr);
+        res.redirect('/spots');
+      });
     } catch (e) {
       await conn.rollback();
       if (e.code === 'ER_DUP_ENTRY') {
@@ -96,7 +99,8 @@ router.post('/login', async (req, res, next) => {
         form: req.body,
       });
     }
-    // regenerate session id to prevent session fixation
+    // regenerate session id to prevent session fixation, then save before redirect
+    // so the async store flushes the new session and Set-Cookie is emitted
     req.session.regenerate((err) => {
       if (err) return next(err);
       req.session.user = {
@@ -108,7 +112,10 @@ router.post('/login', async (req, res, next) => {
         role: user.role,
       };
       req.session.flash = { type: 'success', msg: `Welcome back, ${user.first_name}!` };
-      res.redirect('/spots');
+      req.session.save((saveErr) => {
+        if (saveErr) return next(saveErr);
+        res.redirect('/spots');
+      });
     });
   } catch (e) {
     next(e);
