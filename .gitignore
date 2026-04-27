@@ -15,8 +15,9 @@ coverage/
 # Test screenshots generated at repo root
 /*.png
 
-# GCP deployment (not in use)
+# GCP deployment config (contains production secrets — use deploy/app.yaml as template)
 deploy/
+app.yaml
 
 # Live database dump — use sql/ schema files instead
 parking_shark.sql

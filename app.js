@@ -20,20 +20,8 @@ app.use(express.json());
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// session store lives in mysql so multiple app instances share state
-const sessionStoreOpts = {
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
-  createDatabaseTable: true,
-};
-if (process.env.CLOUD_SQL_CONNECTION_NAME) {
-  sessionStoreOpts.socketPath = `/cloudsql/${process.env.CLOUD_SQL_CONNECTION_NAME}`;
-} else {
-  sessionStoreOpts.host = process.env.DB_HOST || '127.0.0.1';
-  sessionStoreOpts.port = parseInt(process.env.DB_PORT || '3306', 10);
-}
-const sessionStore = new MySQLStore(sessionStoreOpts);
+// Pass the existing pool so the session store uses the same Cloud SQL connection
+const sessionStore = new MySQLStore({ createDatabaseTable: true }, pool);
 
 app.use(
   session({
