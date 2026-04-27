@@ -1,5 +1,4 @@
-// Renter + host dashboards.
-// SQL reference: §4.5, §4.6, §4.9, §4.15.
+// renter and host dashboards
 
 const express = require('express');
 const pool = require('../config/db');
@@ -7,7 +6,6 @@ const { requireLogin } = require('../middleware/auth');
 
 const router = express.Router();
 
-// ---------- GET /dashboard/renter - my bookings (§4.5) ----------
 router.get('/renter', requireLogin, async (req, res, next) => {
   try {
     const [reservations] = await pool.query(
@@ -30,10 +28,9 @@ router.get('/renter', requireLogin, async (req, res, next) => {
   }
 });
 
-// ---------- GET /dashboard/host - my listings + bookings-for-me (§4.6, §4.15) ----------
 router.get('/host', requireLogin, async (req, res, next) => {
   try {
-    // §4.15 — my listings
+    // host listings
     const [spots] = await pool.query(
       `SELECT s.spot_id, s.hourly_rate, s.is_active, s.instructions,
               a.street, a.city, st.type_name,
@@ -46,7 +43,7 @@ router.get('/host', requireLogin, async (req, res, next) => {
       [req.session.user.user_id],
     );
 
-    // §4.6 — bookings on my spots
+    // bookings on host spots
     const [bookings] = await pool.query(
       `SELECT r.reservation_id, r.start_time, r.end_time, r.total_cost,
               rs.status_name,
@@ -65,7 +62,7 @@ router.get('/host', requireLogin, async (req, res, next) => {
       [req.session.user.user_id],
     );
 
-    // §4.9 — reviews on my spots
+    // reviews on host spots
     const [reviews] = await pool.query(
       `SELECT rv.reservation_id, rv.rating, rv.comment, rv.created_at,
               u.first_name AS renter_first, u.last_name AS renter_last,
@@ -80,7 +77,7 @@ router.get('/host', requireLogin, async (req, res, next) => {
       [req.session.user.user_id],
     );
 
-    // §4.10 — my avg rating
+    // host average rating
     const [[ratingRow]] = await pool.query(
       `SELECT ROUND(AVG(rv.rating), 2) AS avg_rating, COUNT(rv.reservation_id) AS total_reviews
          FROM users u

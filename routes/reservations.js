@@ -1,6 +1,4 @@
-// Reservations, payments, reviews.
-// SQL reference: parking_shark.sql §4.5, §4.7, §4.14, §5.2–5.5, §5.10,
-//                §6.6, §6.7, and the create_booking stored procedure.
+// reservations, payments, reviews
 
 const express = require('express');
 const pool = require('../config/db');
@@ -8,12 +6,8 @@ const { requireLogin, requireReservationOwner } = require('../middleware/auth');
 
 const router = express.Router();
 
-// ---------- POST /reservations - book via stored procedure ----------
-// Uses the create_booking stored procedure (parking_shark.sql §7 "Advanced
-// SQL #2"). The stored proc handles rate lookup, cost calculation,
-// conflict check, reservation insert, and payment insert - atomically.
-// The prevent_double_booking trigger (Advanced SQL #1) runs on the INSERT
-// and raises SIGNAL if an overlap exists.
+// calls the create booking stored procedure atomically
+// the prevent double booking trigger raises a signal on overlap
 router.post('/', requireLogin, async (req, res, next) => {
   const { spot_id, vehicle_id, start_time, end_time, payment_method } = req.body;
   const spotId = parseInt(spot_id, 10);
@@ -66,7 +60,7 @@ router.post('/', requireLogin, async (req, res, next) => {
     req.session.flash = { type: 'success', msg: `Booking #${row.new_id} created.` };
     res.redirect('/dashboard/renter');
   } catch (err) {
-    // Stored procedure raises SIGNAL SQLSTATE '45000' on conflict or bad input.
+    // the procedure raises sqlstate from the trigger to surface conflicts and bad input
     if (err.sqlState === '45000') {
       req.session.flash = { type: 'danger', msg: err.sqlMessage };
       return res.redirect(`/spots/${spotId}`);
@@ -77,7 +71,6 @@ router.post('/', requireLogin, async (req, res, next) => {
   }
 });
 
-// ---------- GET /reservations/:id - detail (§4.7) ----------
 router.get('/:id', requireLogin, requireReservationOwner('id'), async (req, res, next) => {
   try {
     const [[r]] = await pool.query(
@@ -116,8 +109,6 @@ router.get('/:id', requireLogin, requireReservationOwner('id'), async (req, res,
   }
 });
 
-// ---------- POST /reservations/:id/status (AJAX or form) ----------
-// Actions: confirm (§5.2), complete (§5.3), cancel (§5.4).
 router.post('/:id/status', requireLogin, requireReservationOwner('id'), async (req, res, next) => {
   const { action } = req.body;
   const nameMap = {
@@ -129,7 +120,7 @@ router.post('/:id/status', requireLogin, requireReservationOwner('id'), async (r
   if (!target) {
     return res.status(400).json({ error: 'Unknown action.' });
   }
-  // Renter may only cancel; host may confirm/complete/cancel.
+  // renter may only cancel, host may confirm or complete or cancel
   if (action !== 'cancel' && !req.reservationRoles.isHost) {
     return res.status(403).json({ error: 'Only the host can do that.' });
   }
@@ -150,13 +141,12 @@ router.post('/:id/status', requireLogin, requireReservationOwner('id'), async (r
   }
 });
 
-// ---------- POST /reservations/:id/extend - UPDATE end_time ----------
 router.post('/:id/extend', requireLogin, requireReservationOwner('id'), async (req, res, next) => {
   if (!req.reservationRoles.isRenter) {
     return res.status(403).render('error', { title: 'Forbidden', message: 'Only the renter can extend.' });
   }
   try {
-    // Re-check for conflicts before extending.
+    // recheck overlap before extending
     const [[r]] = await pool.query(
       'SELECT spot_id, start_time, hourly_rate_at_booking FROM reservations WHERE reservation_id = ?',
       [req.params.id],
@@ -176,7 +166,7 @@ router.post('/:id/extend', requireLogin, requireReservationOwner('id'), async (r
       req.session.flash = { type: 'danger', msg: 'Cannot extend: another booking overlaps.' };
       return res.redirect(`/reservations/${req.params.id}`);
     }
-    // Recalculate total cost at the booking-time rate.
+    // recalculate total at the booking time rate
     await pool.query(
       `UPDATE reservations
           SET end_time = ?,
@@ -184,7 +174,7 @@ router.post('/:id/extend', requireLogin, requireReservationOwner('id'), async (r
         WHERE reservation_id = ?`,
       [newEnd, newEnd, req.params.id],
     );
-    // Keep payment in sync for Pending payments.
+    // keep pending payments in sync with the new total
     await pool.query(
       `UPDATE payments p
          JOIN reservations r ON p.reservation_id = r.reservation_id
@@ -199,7 +189,6 @@ router.post('/:id/extend', requireLogin, requireReservationOwner('id'), async (r
   }
 });
 
-// ---------- POST /reservations/:id/pay (§5.5) ----------
 router.post('/:id/pay', requireLogin, requireReservationOwner('id'), async (req, res, next) => {
   try {
     await pool.query(
@@ -215,7 +204,6 @@ router.post('/:id/pay', requireLogin, requireReservationOwner('id'), async (req,
   }
 });
 
-// ---------- POST /reservations/:id/review - add review ----------
 router.post('/:id/review', requireLogin, requireReservationOwner('id'), async (req, res, next) => {
   if (!req.reservationRoles.isRenter) {
     return res.status(403).render('error', { title: 'Forbidden', message: 'Only the renter can review.' });
@@ -231,7 +219,7 @@ router.post('/:id/review', requireLogin, requireReservationOwner('id'), async (r
       req.session.flash = { type: 'warning', msg: 'You can only review completed reservations.' };
       return res.redirect(`/reservations/${req.params.id}`);
     }
-    // Upsert (§5.10 or fresh INSERT)
+    // upsert review
     await pool.query(
       `INSERT INTO reviews (reservation_id, rating, comment, created_at)
        VALUES (?, ?, ?, NOW())
@@ -245,7 +233,6 @@ router.post('/:id/review', requireLogin, requireReservationOwner('id'), async (r
   }
 });
 
-// ---------- POST /reservations/:id/review/delete (§6.6) ----------
 router.post(
   '/:id/review/delete',
   requireLogin,
@@ -264,12 +251,11 @@ router.post(
   },
 );
 
-// ---------- POST /reservations/:id/delete (§6.7 - only if Cancelled) ----------
+// only deletable if cancelled
 router.post('/:id/delete', requireLogin, requireReservationOwner('id'), async (req, res, next) => {
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
-    // §6.7 - delete payment then reservation, only if Cancelled.
     await conn.query(
       `DELETE FROM payments
         WHERE reservation_id IN (

@@ -1,11 +1,7 @@
-// Client-side dynamic behavior.
-//
-// 1. Live total-cost preview on the booking form.
-// 2. Inline status updates on the host dashboard.
-// 3. Live price-range filter on the browse page.
+// client side dynamic behavior, live total cost on booking, inline status updates, live price filter
 
 document.addEventListener('DOMContentLoaded', () => {
-  // --- Booking form: live total cost ---
+  // booking form live total cost
   const bookingForm = document.querySelector('[data-booking-form]');
   if (bookingForm) {
     const start = bookingForm.querySelector('[name="start_time"]');
@@ -29,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     end?.addEventListener('input', update);
   }
 
-  // --- Browse page: live price-range filter ---
+  // browse page live price range filter
   const bar = document.getElementById('price-filter-bar');
   const priceSlider = document.getElementById('live-price-filter');
   if (bar && priceSlider) {
@@ -77,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
     applyFilter();
   }
 
-  // --- Host dashboard: inline status buttons ---
+  // host dashboard inline status buttons
   document.querySelectorAll('[data-status-action]').forEach((btn) => {
     btn.addEventListener('click', async (e) => {
       e.preventDefault();

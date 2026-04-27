@@ -1,5 +1,4 @@
-// Vehicles and their registrations.
-// SQL reference: §4.11, §5.7, §6.4, §6.5.
+// vehicles and their registrations
 
 const express = require('express');
 const pool = require('../config/db');
@@ -7,7 +6,6 @@ const { requireLogin } = require('../middleware/auth');
 
 const router = express.Router();
 
-// ---------- GET /vehicles ----------
 router.get('/', requireLogin, async (req, res, next) => {
   try {
     const [vehicles] = await pool.query(
@@ -24,12 +22,11 @@ router.get('/', requireLogin, async (req, res, next) => {
   }
 });
 
-// ---------- GET /vehicles/new ----------
 router.get('/new', requireLogin, (req, res) => {
   res.render('vehicles/form', { title: 'Add a vehicle', form: {}, errors: [] });
 });
 
-// ---------- POST /vehicles - add vehicle + registration ----------
+// add vehicle and registration
 router.post('/', requireLogin, async (req, res, next) => {
   const { make, model, year, color, license_plate, plate_state, expires_on } = req.body;
   const conn = await pool.getConnection();
@@ -72,7 +69,6 @@ router.post('/', requireLogin, async (req, res, next) => {
   }
 });
 
-// ---------- POST /vehicles/:id/verify (§5.7) ----------
 router.post('/:id/verify', requireLogin, async (req, res, next) => {
   try {
     const [[own]] = await pool.query('SELECT user_id FROM vehicles WHERE vehicle_id = ?', [
@@ -94,7 +90,6 @@ router.post('/:id/verify', requireLogin, async (req, res, next) => {
   }
 });
 
-// ---------- POST /vehicles/:id/registration/delete (§6.4) ----------
 router.post('/:id/registration/delete', requireLogin, async (req, res, next) => {
   try {
     const [[own]] = await pool.query('SELECT user_id FROM vehicles WHERE vehicle_id = ?', [
@@ -111,7 +106,7 @@ router.post('/:id/registration/delete', requireLogin, async (req, res, next) => 
   }
 });
 
-// ---------- POST /vehicles/:id/delete (§6.5 - safe delete) ----------
+// safe delete
 router.post('/:id/delete', requireLogin, async (req, res, next) => {
   const conn = await pool.getConnection();
   try {
@@ -122,7 +117,7 @@ router.post('/:id/delete', requireLogin, async (req, res, next) => {
       return res.status(403).render('error', { title: 'Forbidden', message: 'Not your vehicle.' });
     }
     await conn.beginTransaction();
-    // §6.5 pattern - only delete if no reservations reference the vehicle.
+    // only delete if no reservations reference the vehicle
     const [del] = await conn.query(
       `DELETE FROM vehicles
         WHERE vehicle_id = ?

@@ -1,5 +1,4 @@
-// Profile: view profile, edit names/email, manage phone numbers.
-// SQL reference: §4.12, §4.13, §5.6, §6.3.
+// profile view and edit, plus phone number management
 
 const express = require('express');
 const pool = require('../config/db');
@@ -7,7 +6,6 @@ const { requireLogin } = require('../middleware/auth');
 
 const router = express.Router();
 
-// ---------- GET /profile ----------
 router.get('/', requireLogin, async (req, res, next) => {
   try {
     const [[user]] = await pool.query(
@@ -25,7 +23,6 @@ router.get('/', requireLogin, async (req, res, next) => {
   }
 });
 
-// ---------- POST /profile (§5.6) ----------
 router.post('/', requireLogin, async (req, res, next) => {
   try {
     const { first_name, last_name, email } = req.body;
@@ -47,7 +44,6 @@ router.post('/', requireLogin, async (req, res, next) => {
   }
 });
 
-// ---------- POST /profile/phones - add ----------
 router.post('/phones', requireLogin, async (req, res, next) => {
   try {
     await pool.query(
@@ -64,7 +60,6 @@ router.post('/phones', requireLogin, async (req, res, next) => {
   }
 });
 
-// ---------- POST /profile/phones/delete (§6.3) ----------
 router.post('/phones/delete', requireLogin, async (req, res, next) => {
   try {
     await pool.query(

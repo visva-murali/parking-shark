@@ -1,9 +1,4 @@
-// Application-level security middleware.
-//
-// requireLogin         - blocks anonymous users from any protected route.
-// requireAdmin         - only admins (role='admin').
-// requireSpotOwner     - must be the host_user_id of :id.
-// requireReservationOwner - must be the renter or the spot's host.
+// application level access control, session check and ownership checks against the database
 
 const pool = require('../config/db');
 
