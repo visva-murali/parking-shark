@@ -11,6 +11,10 @@ const pool = require('./config/db');
 
 const app = express();
 
+// Trust App Engine's load balancer so req.secure = true for HTTPS requests
+// (without this, express-session refuses to set secure cookies behind the proxy)
+app.set('trust proxy', 1);
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(expressLayouts);
