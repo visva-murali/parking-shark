@@ -1,4 +1,4 @@
-// Data export (CSV). Counts as the "extra feature" for the rubric.
+// csv export
 
 const express = require('express');
 const { stringify } = require('csv-stringify/sync');
@@ -14,7 +14,7 @@ function sendCsv(res, filename, rows) {
   res.send(csv);
 }
 
-// ---------- GET /export/reservations.csv (renter's own bookings) ----------
+// renter own bookings
 router.get('/reservations.csv', requireLogin, async (req, res, next) => {
   try {
     const [rows] = await pool.query(
@@ -37,7 +37,7 @@ router.get('/reservations.csv', requireLogin, async (req, res, next) => {
   }
 });
 
-// ---------- GET /export/host-bookings.csv (host's incoming) ----------
+// host incoming bookings
 router.get('/host-bookings.csv', requireLogin, async (req, res, next) => {
   try {
     const [rows] = await pool.query(

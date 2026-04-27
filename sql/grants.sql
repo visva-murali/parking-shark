@@ -16,7 +16,7 @@
 -- Application user (end-user-facing)
 -- -------------------------------------------------------------
 DROP USER IF EXISTS 'ps_app'@'%';
-CREATE USER 'ps_app'@'%' IDENTIFIED BY 'REPLACE_WITH_STRONG_PW';
+CREATE USER 'ps_app'@'%' IDENTIFIED BY 'psapppw123';
 
 -- Regular DML on transactional tables
 GRANT SELECT, INSERT, UPDATE, DELETE
@@ -68,7 +68,7 @@ REVOKE DROP, ALTER, CREATE VIEW, CREATE ROUTINE, ALTER ROUTINE,
 -- Developer user (team members)
 -- -------------------------------------------------------------
 DROP USER IF EXISTS 'ps_dev'@'%';
-CREATE USER 'ps_dev'@'%' IDENTIFIED BY 'REPLACE_WITH_STRONG_PW';
+CREATE USER 'ps_dev'@'%' IDENTIFIED BY 'psapppw123';
 GRANT ALL PRIVILEGES ON parking_shark.* TO 'ps_dev'@'%';
 
 FLUSH PRIVILEGES;

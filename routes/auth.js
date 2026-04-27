@@ -1,10 +1,4 @@
-// Authentication: register, login, logout.
-//
-// Security notes:
-//   - Passwords hashed with bcrypt (cost 12).
-//   - Passwords compared with bcrypt.compare (constant-time).
-//   - All DB queries use parameterized ? placeholders.
-//   - Login failures return the same message to avoid user enumeration.
+// authentication routes, bcrypt hashed passwords, parameterized queries, generic failure message to avoid user enumeration
 
 const express = require('express');
 const bcrypt = require('bcrypt');
@@ -13,7 +7,6 @@ const pool = require('../config/db');
 
 const router = express.Router();
 
-// ---------- Register ----------
 router.get('/register', (req, res) => {
   res.render('auth/register', { title: 'Sign up', errors: [], form: {} });
 });
@@ -82,7 +75,6 @@ router.post(
   },
 );
 
-// ---------- Login ----------
 router.get('/login', (req, res) => {
   res.render('auth/login', { title: 'Log in', error: null, form: {} });
 });
@@ -90,7 +82,6 @@ router.get('/login', (req, res) => {
 router.post('/login', async (req, res, next) => {
   const { email, password } = req.body;
   try {
-    // SQL §4.13 variant — lookup by email, fetch hash for verification.
     const [rows] = await pool.query(
       `SELECT user_id, computing_id, first_name, last_name, email, role, password_hash
          FROM users
@@ -105,7 +96,7 @@ router.post('/login', async (req, res, next) => {
         form: req.body,
       });
     }
-    // Regenerate session id on login (prevents session fixation).
+    // regenerate session id to prevent session fixation
     req.session.regenerate((err) => {
       if (err) return next(err);
       req.session.user = {
@@ -124,7 +115,6 @@ router.post('/login', async (req, res, next) => {
   }
 });
 
-// ---------- Logout ----------
 router.post('/logout', (req, res) => {
   req.session.destroy(() => {
     res.clearCookie('ps_sid');

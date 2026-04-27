@@ -10,20 +10,17 @@ const pool = require('./config/db');
 
 const app = express();
 
-// ---------- View engine ----------
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(expressLayouts);
 app.set('layout', 'layout');
 
-// ---------- Body parsers ----------
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// ---------- Static ----------
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ---------- Session store (in MySQL so multi-instance works) ----------
+// session store lives in mysql so multiple app instances share state
 const sessionStoreOpts = {
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
@@ -49,12 +46,11 @@ app.use(
       httpOnly: true,
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+      maxAge: 1000 * 60 * 60 * 24 * 7,
     },
   }),
 );
 
-// ---------- Flash (roll our own, no extra dep) ----------
 app.use((req, res, next) => {
   res.locals.flash = req.session.flash || null;
   delete req.session.flash;
@@ -63,7 +59,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// ---------- Routes ----------
 app.get('/', (req, res) => {
   if (req.session.user) return res.redirect('/spots');
   res.locals.noContainer = true;
@@ -78,12 +73,10 @@ app.use('/dashboard', require('./routes/dashboard'));
 app.use('/export', require('./routes/data'));
 app.use('/profile', require('./routes/profile'));
 
-// ---------- 404 ----------
 app.use((req, res) => {
   res.status(404).render('error', { title: 'Not found', message: 'Page not found.' });
 });
 
-// ---------- Error handler ----------
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(500).render('error', {
