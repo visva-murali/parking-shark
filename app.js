@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const path = require('path');
+const mysql = require('mysql2');
 const express = require('express');
 const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
@@ -20,8 +21,21 @@ app.use(express.json());
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Pass the existing pool so the session store uses the same Cloud SQL connection
-const sessionStore = new MySQLStore({ createDatabaseTable: true }, pool);
+// express-mysql-session needs the callback-based mysql2 API (not the promise pool).
+// Build a dedicated callback pool with the same Cloud SQL socket config.
+const sessionPoolConfig = {
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
+};
+if (process.env.CLOUD_SQL_CONNECTION_NAME) {
+  sessionPoolConfig.socketPath = `/cloudsql/${process.env.CLOUD_SQL_CONNECTION_NAME}`;
+} else {
+  sessionPoolConfig.host = process.env.DB_HOST || '127.0.0.1';
+  sessionPoolConfig.port = parseInt(process.env.DB_PORT || '3306', 10);
+}
+const sessionPool = mysql.createPool(sessionPoolConfig);
+const sessionStore = new MySQLStore({ createDatabaseTable: true }, sessionPool);
 
 app.use(
   session({
