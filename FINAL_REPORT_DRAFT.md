@@ -20,23 +20,7 @@ Parking Shark is a peer-to-peer parking marketplace. Users can list parking spot
 
 ### Final E-R Diagram
 
-```mermaid
-erDiagram
-  users ||--o{ user_phones : has
-  users ||--o{ vehicles : owns
-  vehicles ||--o| vehicle_registrations : has
-  users ||--o{ spots : hosts
-  addresses ||--o{ spots : locates
-  spot_types ||--o{ spots : classifies
-  spots ||--o{ spot_photos : has
-  spots ||--o{ availability_windows : has
-  spots ||--o{ reservations : receives
-  users ||--o{ reservations : rents
-  vehicles ||--o{ reservations : used_for
-  reservation_statuses ||--o{ reservations : labels
-  reservations ||--o| payments : has
-  reservations ||--o| reviews : receives
-```
+![Parking Shark E-R Diagram](er_diagram.png)
 
 ### Final Schema Statements
 
